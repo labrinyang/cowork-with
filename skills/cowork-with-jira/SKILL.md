@@ -126,12 +126,24 @@ To Do → In Progress → In Review → Done
 ### Issue Creation Flow
 
 ```
-1. acli-operator (haiku)  → Read Jira (existing issues, project context, sprint)
-2. Explore subagent       → Search codebase if needed for context
-3. Main model             → Draft title, description, acceptance criteria
-4. Preview to user        → Show full draft for confirmation
-5. acli-operator (haiku)  → Submit to Jira after user approves
+1. acli-operator (haiku)  → Identify active sprint (search user's recent issues or JQL)
+2. acli-operator (haiku)  → Read Jira context (existing issues, project, epics)
+3. Explore subagent       → Search codebase if needed for context
+4. Main model             → Draft title, description, acceptance criteria
+5. Preview to user        → Show full draft for confirmation (include sprint info)
+6. acli-operator (haiku)  → Create issue after user approves
+7. acli-operator (haiku)  → Add to sprint if user confirms (see Sprint Assignment below)
 ```
+
+### Sprint Assignment
+
+`workitem create` has no `--sprint` flag. To add an issue to a sprint after creation, use `workitem edit`:
+
+```bash
+acli jira workitem edit --key "PROJ-123" --from-json sprint-move.json --yes --json
+```
+
+If `workitem edit` does not support sprint fields, sprint assignment must be done through the Jira web UI. Inform the user accordingly.
 
 ### Issue Update Flow
 
@@ -170,12 +182,15 @@ Epics group related stories under a theme or feature area.
 The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's job).
 
 - **Check active sprint:** query via JQL `sprint in openSprints()`
-- **View sprint items:** `acli jira sprint list-workitems --sprint-id ID --json`
+- **List sprints for a board:** `acli jira board list-sprints --id BOARD_ID --state active --json`
+- **View sprint items** (both flags required): `acli jira sprint list-workitems --sprint SPRINT_ID --board BOARD_ID --json`
 - **Never auto-add issues to a sprint** — let the user or Scrum Master decide
 - When user asks "what am I working on?", search:
   ```
   acli jira workitem search --jql "sprint in openSprints() AND assignee = currentUser()" --json
   ```
+
+> **Anti-pattern:** Board is a Jira view-layer concept. You cannot reverse-lookup which board an issue belongs to. Do not iterate boards to locate an issue — use JQL search instead.
 
 ### Sub-tasks
 

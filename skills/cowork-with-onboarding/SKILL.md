@@ -101,9 +101,16 @@ Install instructions depend on how the user manages plugins. Point them to the s
 
 ## Completion
 
-After all steps pass, confirm:
+After all steps pass, confirm readiness and display available commands:
+
+**Setup Status:**
 - Homebrew: installed
 - acli: installed and authenticated
 - Jira: accessible
 
-The user is ready to use `/cowork-with:cowork-with-jira`.
+**Available Commands:**
+
+| Command | Description |
+|---------|-------------|
+| `/cowork-with:cowork-with-jira` | Jira workflow — issue creation, status transitions, sprint queries, epic management |
+| `/cowork-with:cowork-with-onboarding` | Re-run this setup guide |

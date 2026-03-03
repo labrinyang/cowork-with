@@ -21,7 +21,7 @@ claude --plugin-dir /path/to/cowork-with
 
 ## Setup
 
-After installing the plugin, run the onboarding skill:
+After installing the plugin, press `Ctrl+C` to exit and restart Claude Code. Then run:
 
 ```
 /cowork-with:cowork-with-onboarding
@@ -32,6 +32,8 @@ This walks you through:
 2. Installing the Atlassian CLI (`acli`)
 3. Authenticating with your Jira Cloud instance
 4. Configuring Claude Code permissions (optional)
+
+Once ready, it displays all available commands.
 
 ## Usage
 

@@ -4,16 +4,13 @@ Agile workflow plugin for Claude Code. Integrates Jira issue tracking, sprint ma
 
 ## Install
 
+All plugin commands are **slash commands inside Claude Code**, not terminal commands.
+
 ### From marketplace
 
-```bash
-claude plugin add cowork-with@cowork-with-marketplace
 ```
-
-### From GitHub
-
-```bash
-claude plugin add github:labrinyang/cowork-with
+/plugin marketplace add labrinyang/cowork-with-marketplace
+/plugin install cowork-with@cowork-with-marketplace
 ```
 
 ### Local development

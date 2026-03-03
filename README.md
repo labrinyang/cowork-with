@@ -24,7 +24,7 @@ claude --plugin-dir /path/to/cowork-with
 After installing the plugin, run the onboarding skill:
 
 ```
-/cowork-with:onboarding
+/cowork-with:cowork-with-onboarding
 ```
 
 This walks you through:
@@ -36,7 +36,7 @@ This walks you through:
 ## Usage
 
 ```
-/cowork-with:jira        <- activate Jira workflow
+/cowork-with:cowork-with-jira   <- activate Jira workflow
 Create a story for...    <- issues follow conventions automatically
 What's in my sprint?     <- sprint-aware queries
 Fix the bug in...        <- commit triggers task closure check
@@ -46,8 +46,8 @@ Fix the bug in...        <- commit triggers task closure check
 
 | Skill | Command | Purpose |
 |-------|---------|---------|
-| Jira | `/cowork-with:jira` | Issue CRUD, sprints, epics, status transitions |
-| Onboarding | `/cowork-with:onboarding` | Setup: Homebrew, acli, authentication |
+| Jira | `/cowork-with:cowork-with-jira` | Issue CRUD, sprints, epics, status transitions |
+| Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: Homebrew, acli, authentication |
 
 ## How It Works
 
@@ -63,10 +63,10 @@ Fix the bug in...        <- commit triggers task closure check
 cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
 ├── skills/
-│   ├── onboarding/SKILL.md       # Setup guide
-│   └── jira/
-│       ├── SKILL.md              # Main Jira workflow
-│       └── acli-reference.md     # Command reference
+│   ├── cowork-with-onboarding/SKILL.md  # Setup guide
+│   └── cowork-with-jira/
+│       ├── SKILL.md                     # Main Jira workflow
+│       └── acli-reference.md            # Command reference
 ├── agents/acli-operator.md       # Haiku subagent for acli
 ├── hooks/hooks.json              # Post-commit hook config
 └── scripts/post-commit-check.sh  # Git commit detection

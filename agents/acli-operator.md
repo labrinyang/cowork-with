@@ -50,6 +50,6 @@ acli jira sprint list-workitems --sprint-id SPRINT_ID --json
 
 ## Error Handling
 
-- If acli is not installed: return "acli is not installed. Run `/cowork-with:onboarding` to set up."
+- If acli is not installed: return "acli is not installed. Run `/cowork-with:cowork-with-onboarding` to set up."
 - If not authenticated: return "Not authenticated. Run: `acli jira auth login --web`"
 - If command fails: return the stderr output verbatim

@@ -5,8 +5,8 @@
 Initial release.
 
 ### Skills
-- **jira**: Main Jira workflow — issue CRUD, status transitions, sprint awareness, epic management
-- **onboarding**: Setup guide for Homebrew, acli CLI, and Jira authentication
+- **cowork-with-jira**: Main Jira workflow — issue CRUD, status transitions, sprint awareness, epic management
+- **cowork-with-onboarding**: Setup guide for Homebrew, acli CLI, and Jira authentication
 
 ### Agents
 - **acli-operator**: Haiku subagent for executing acli CLI commands

@@ -1,5 +1,5 @@
 ---
-name: onboarding
+name: cowork-with-onboarding
 description: Guides installation of Homebrew, the Atlassian acli CLI, authentication with Jira, and optional superpowers plugin setup. Use when the user needs to set up acli or mentions Jira CLI setup.
 disable-model-invocation: true
 allowed-tools: Bash, Read, AskUserQuestion
@@ -106,4 +106,4 @@ After all steps pass, confirm:
 - acli: installed and authenticated
 - Jira: accessible
 
-The user is ready to use `/cowork-with:jira`.
+The user is ready to use `/cowork-with:cowork-with-jira`.

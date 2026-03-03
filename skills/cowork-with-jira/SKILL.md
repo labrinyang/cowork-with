@@ -1,5 +1,5 @@
 ---
-name: jira
+name: cowork-with-jira
 description: Use when working with Jira issues, sprints, epics, or any Jira workflow. Activate for issue creation, status transitions, sprint management, commit workflows, and agile project organization. Also activate when the user mentions Jira tickets, stories, bugs, tasks, or board management.
 ---
 
@@ -15,7 +15,7 @@ Ensure `acli` is installed and authenticated. Quick check:
 acli jira auth status
 ```
 
-If not set up, run `/cowork-with:onboarding`.
+If not set up, run `/cowork-with:cowork-with-onboarding`.
 
 ## Issue Conventions
 

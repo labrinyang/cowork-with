@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 (2026-03-03)
+
+### Changed
+- Rename skills to `cowork-with-jira` and `cowork-with-onboarding` namespace convention
+
 ## 1.0.0 (2026-03-03)
 
 Initial release.

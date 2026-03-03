@@ -156,11 +156,18 @@ If `workitem edit` does not support sprint fields, sprint assignment must be don
 
 ### Key Rules
 
-- **Always preview issue content before submission.** Show title, type, description, labels, priority before creating or making content changes.
+<HARD-GATE>
+Always preview issue content before submission. Show title, type, description, labels, priority before creating or making content changes. Do NOT submit to Jira without user confirmation.
+</HARD-GATE>
+
 - **Status-only transitions skip preview** — apply directly.
 - **All acli commands use `--json` flag** for structured output.
 - **Transitions use `--yes` flag** to avoid interactive prompts.
-- For complete acli command syntax, see the `acli-reference` skill.
+- For complete acli command syntax, see `cowork-with:acli-reference`.
+
+**Related skills:**
+- **cowork-with:acli-reference** — CLI command templates and JQL queries
+- **cowork-with:cowork-with-onboarding** — Setup and authentication
 
 ## Agile Workflow
 

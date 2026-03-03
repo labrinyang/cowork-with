@@ -1,6 +1,6 @@
 {
   "name": "cowork-with",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Agile workflow plugin for Claude Code. Integrates Jira issue tracking, sprint management, and automated task lifecycle via the Atlassian acli CLI.",
   "author": {
     "name": "labrinyang",

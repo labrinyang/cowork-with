@@ -50,7 +50,6 @@ Fix the bug in...        <- commit triggers task closure check
 |-------|---------|---------|
 | Jira | `/cowork-with:cowork-with-jira` | Issue CRUD, sprints, epics, status transitions |
 | Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: Homebrew, acli, authentication |
-| acli Reference | `/cowork-with:acli-reference` | CLI command templates (also pre-loaded into acli-operator) |
 
 ## How It Works
 
@@ -67,8 +66,13 @@ cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
 ├── skills/
 │   ├── cowork-with-onboarding/SKILL.md  # Setup guide
-│   ├── cowork-with-jira/SKILL.md        # Main Jira workflow
-│   └── acli-reference/SKILL.md          # CLI command reference (pre-loaded into agent)
+│   └── cowork-with-jira/SKILL.md        # Main Jira workflow
+├── reference/                           # acli CLI command reference (progressive disclosure)
+│   ├── index.md                         # Overview, anti-patterns, file index
+│   ├── workitems.md                     # Create, search, view, edit, transition, assign
+│   ├── workitems-advanced.md            # Comments, links, attachments, clone, bulk
+│   ├── boards-sprints.md                # Boards, sprint CRUD
+│   └── jql.md                           # JQL queries, projects, filters
 ├── agents/acli-operator.md       # Haiku subagent for acli
 ├── hooks/hooks.json              # Post-commit hook config
 └── scripts/post-commit-check.sh  # Git commit detection

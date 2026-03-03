@@ -113,5 +113,4 @@ After all steps pass, confirm readiness and display available commands:
 | Command | Description |
 |---------|-------------|
 | `/cowork-with:cowork-with-jira` | Jira workflow — issue creation, status transitions, sprint queries, epic management |
-| `/cowork-with:acli-reference` | acli CLI command reference and JQL templates |
 | `/cowork-with:cowork-with-onboarding` | Re-run this setup guide |

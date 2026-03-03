@@ -28,9 +28,9 @@ acli jira <resource> <action> [--flags] --json
 ## Rules
 
 <HARD-GATE>
-Before executing any command you are unsure about, read the acli-reference skill for exact parameter names:
-`skills/acli-reference/SKILL.md`
-Do NOT guess parameter names. Wrong flags waste turns.
+Before executing any command you are unsure about, read the reference index first:
+`reference/index.md`
+Then read the specific reference file listed there. Do NOT guess parameter names — wrong flags waste turns.
 </HARD-GATE>
 
 - Always append `--json` for structured output

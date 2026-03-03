@@ -163,10 +163,10 @@ Always preview issue content before submission. Show title, type, description, l
 - **Status-only transitions skip preview** — apply directly.
 - **All acli commands use `--json` flag** for structured output.
 - **Transitions use `--yes` flag** to avoid interactive prompts.
-- For complete acli command syntax, see `cowork-with:acli-reference`.
+- For complete acli command syntax, see `reference/index.md`.
 
-**Related skills:**
-- **cowork-with:acli-reference** — CLI command templates and JQL queries
+**Related resources:**
+- **reference/** — acli CLI command templates, split by topic (workitems, sprints, JQL)
 - **cowork-with:cowork-with-onboarding** — Setup and authentication
 
 ## Agile Workflow

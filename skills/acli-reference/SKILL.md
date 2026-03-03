@@ -1,6 +1,19 @@
+---
+name: acli-reference
+description: Atlassian acli CLI command reference for Jira operations. Contains exact parameter names, command templates, and common JQL queries. Pre-loaded into acli-operator subagent.
+---
+
 # acli Command Reference
 
-Commands for the `acli-operator` subagent. Always append `--json` for structured output.
+Always append `--json` for structured output. Use `--yes` on write commands to skip prompts.
+
+## Anti-patterns
+
+- **Do NOT use `--board-id`** — the correct flag is `--id` for `board list-sprints`
+- **Do NOT use `--sprint-id`** — the correct flag is `--sprint` for `sprint list-workitems`
+- **Do NOT omit `--board`** on `sprint list-workitems` — it is required
+- **Do NOT iterate boards to find an issue** — Board is a view-layer concept, use JQL search instead
+- **`workitem create` has no `--sprint` flag** — create first, then assign to sprint via edit or Jira UI
 
 ## Authentication
 
@@ -26,11 +39,9 @@ acli jira workitem create \
   --json
 ```
 
-Supported `--type` values: `Story`, `Bug`, `Task`, `Epic`, `Sub-task`
+Supported `--type`: `Story`, `Bug`, `Task`, `Epic`, `Sub-task`
 
-Optional flags: `--parent "PROJ-100"` (for sub-tasks or linking to epics), `--description-file`, `--from-json`, `--editor`
-
-> **Note:** `workitem create` has no `--sprint` flag. To add an issue to a sprint, create it first then use `workitem edit` or the Jira web UI.
+Optional: `--parent "PROJ-100"`, `--description-file`, `--from-json`, `--editor`
 
 ### Search (JQL)
 
@@ -42,7 +53,7 @@ acli jira workitem search \
   --limit 20
 ```
 
-Additional flags: `--filter <ID>`, `--paginate`, `--count`, `--csv`, `--web`
+Optional: `--filter <ID>`, `--paginate`, `--count`, `--csv`, `--web`
 
 ### View
 
@@ -62,9 +73,9 @@ acli jira workitem edit \
   --json
 ```
 
-Editable fields: `--summary`, `--description`, `--assignee`, `--labels`, `--type`, `--remove-assignee`, `--remove-labels`
+Editable: `--summary`, `--description`, `--assignee`, `--labels`, `--type`, `--remove-assignee`, `--remove-labels`
 
-Bulk edit: `--jql "..."` or `--filter <ID>` instead of `--key`
+Bulk: `--jql "..."` or `--filter <ID>` instead of `--key`
 
 ### Transition Status
 
@@ -76,7 +87,7 @@ acli jira workitem transition \
   --json
 ```
 
-Bulk transition: `--jql "..."` or `--filter <ID>` instead of `--key`
+Bulk: `--jql "..."` or `--filter <ID>` instead of `--key`
 
 ### Comment
 
@@ -106,7 +117,7 @@ acli jira workitem assign \
   --json
 ```
 
-Remove assignee: `--remove-assignee`
+Remove: `--remove-assignee`
 
 ### Clone
 
@@ -121,20 +132,15 @@ acli jira workitem clone \
 ### Bulk Create
 
 ```bash
-# From JSON file
 acli jira workitem create-bulk --from-json issues.json
-
-# From CSV file
 acli jira workitem create-bulk --from-csv issues.csv
-
-# Generate example JSON template
 acli jira workitem create-bulk --generate-json
 ```
 
 ### Links
 
 ```bash
-# Create link between issues
+# Create link
 acli jira workitem link create --out "PROJ-1" --in "PROJ-2" --type "Blocks" --yes
 
 # List links
@@ -150,10 +156,10 @@ acli jira workitem link type --json
 ### Attachments
 
 ```bash
-# List attachments
+# List
 acli jira workitem attachment list --key "PROJ-123" --json
 
-# Delete attachment
+# Delete
 acli jira workitem attachment delete --id "12345"
 ```
 
@@ -175,45 +181,36 @@ acli jira workitem attachment delete --id "12345"
 | Get board details | `acli jira board get --id 123 --json` |
 | List sprints | `acli jira board list-sprints --id 123 --state active --json` |
 
-> **Anti-pattern:** Board is a Jira view-layer concept. You cannot reverse-lookup which board an issue belongs to. Do not iterate boards to locate an issue — use JQL search instead.
-
 ## Sprints
 
 ```bash
-# List work items in a sprint (both --sprint and --board are REQUIRED)
+# List work items (both --sprint and --board REQUIRED)
 acli jira sprint list-workitems --sprint 1 --board 6 --json
 
-# Create sprint
+# Create
 acli jira sprint create --name "Sprint 1" --board 5 --json
 
-# Create with dates and goal
+# Create with dates
 acli jira sprint create --name "Sprint 2" --board 5 \
   --start "2025-01-01" --end "2025-01-14" --goal "Q1 release prep" --json
 
-# View sprint details
+# View
 acli jira sprint view --id 37 --json
 
-# Update sprint
+# Update
 acli jira sprint update --id 37 --name "Sprint 1 - Final" --state closed --json
 
-# Delete sprint
+# Delete
 acli jira sprint delete --id 37 --yes
 ```
 
 ## Filters
 
 ```bash
-# List my filters
 acli jira filter list --my --json
-
-# List favourites
 acli jira filter list --favourite --json
-
-# Search filters
 acli jira filter search --json
 acli jira filter search --name "report" --owner "user@atlassian.com" --json
-
-# Get filter by ID
 acli jira filter get --id 12345 --json
 ```
 

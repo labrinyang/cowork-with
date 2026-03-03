@@ -160,7 +160,7 @@ If `workitem edit` does not support sprint fields, sprint assignment must be don
 - **Status-only transitions skip preview** — apply directly.
 - **All acli commands use `--json` flag** for structured output.
 - **Transitions use `--yes` flag** to avoid interactive prompts.
-- For complete acli command syntax, see [acli-reference.md](acli-reference.md).
+- For complete acli command syntax, see the `acli-reference` skill.
 
 ## Agile Workflow
 

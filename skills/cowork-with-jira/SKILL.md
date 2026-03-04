@@ -17,22 +17,26 @@ MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onbo
 
 **No type prefix.** Jira tracks issue types natively — never prefix with `[Feature]`, `Bug:`, etc.
 
-### Description Template
+### Description Format
+
+**Plain text only.** Jira does NOT render Markdown — no `##`, `**`, `- [ ]`, or backtick fences. Use Jira wiki markup or plain text with simple line breaks.
 
 Every issue description MUST include these sections:
 
-```markdown
-## Background
-[Why this issue exists. What problem it solves. Any relevant context.]
+```
+Background
+Why this issue exists. What problem it solves. Any relevant context.
 
-## Acceptance Criteria
-- [ ] [Specific, testable criterion]
-- [ ] [Another criterion]
+Acceptance Criteria
+- Specific, testable criterion
+- Another criterion
 ```
 
 Do not skip Acceptance Criteria. Even for small tasks, at least one criterion is required.
 
 ### Issue Type Selection
+
+Issue type names are **localized** — a project may use `"Bug"`, `"缺陷 Bug"`, `"バグ"`, etc. **Always** use a haiku subagent to call `getJiraProjectIssueTypesMetadata` first and use the exact type name returned.
 
 | Intent | Jira Type | Label | When to use |
 |--------|-----------|-------|-------------|
@@ -101,18 +105,18 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 ### MCP Tools
 
 **Read** (haiku subagent):
-- `getJiraIssue` — read a single issue
-- `searchJiraIssuesUsingJql` — search issues with JQL
+- `getJiraIssue` — read a single issue (param: `issueIdOrKey`)
+- `searchJiraIssuesUsingJql` — search issues with JQL (param: `maxResults` must be **number**, not string)
 - `getVisibleJiraProjects` — list projects
-- `getJiraProjectIssueTypesMetadata` — issue types for a project
-- `getJiraIssueTypeMetaWithFieldsData` — field metadata for an issue type
+- `getJiraProjectIssueTypesMetadata` — issue types for a project (param: `projectIdOrKey`)
+- `getJiraIssueTypeMetaWithFieldsData` — field metadata for an issue type (param: `projectIdOrKey`, `issueTypeId`)
 - `getTransitionsForJiraIssue` — available status transitions
 - `getJiraIssueRemoteIssueLinks` — remote links on an issue
 - `lookupJiraAccountId` — resolve user name/email to account ID
 
 **Write** (main model, after user confirmation):
-- `createJiraIssue` — create a new issue
-- `editJiraIssue` — update an existing issue
+- `createJiraIssue` — create a new issue (param: `issueTypeName` — NOT `issueType`; `labels` is array of strings)
+- `editJiraIssue` — update an existing issue (param: `issueIdOrKey`; `fields` must be **object**, not JSON string)
 - `transitionJiraIssue` — change issue status
 - `addCommentToJiraIssue` — add a comment
 - `addWorklogToJiraIssue` — log work time
@@ -120,17 +124,33 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 ### Issue Creation Flow
 
 ```
-1. Haiku subagent        → Read Jira context (search existing issues, confirm project, check sprint)
-2. Main model            → Read git context if relevant (branch, recent commits, diff)
-3. Explore subagent      → Search codebase if needed for context
-4. Main model            → Draft title, description, acceptance criteria
-5. Main model            → Preview to user for confirmation
-6. Main model            → Create issue after user approves (createJiraIssue)
-7. Main model            → Offer to create a feature branch (git checkout -b feat/PROJ-123-slug)
+1. Haiku subagent        → Read project metadata:
+                           a. getJiraProjectIssueTypesMetadata (exact localized type names)
+                           b. getJiraIssueTypeMetaWithFieldsData (ALL required fields incl. custom)
+                           c. searchJiraIssuesUsingJql "sprint in openSprints()" (active sprint)
+2. Main model            → Compare required fields vs. known values
+                           If ANY required field is missing → ask user via AskUserQuestion BEFORE drafting
+3. Main model            → Ask user which sprint to assign (show active sprint name), or skip
+4. Main model            → Read git context if relevant (branch, recent commits, diff)
+5. Explore subagent      → Search codebase if needed for context
+6. Main model            → Draft title, description (plain text!), acceptance criteria
+7. Main model            → Preview FULL draft to user via AskUserQuestion (HARD-GATE below)
+8. Main model            → Create issue after user approves (createJiraIssue)
+9. Main model            → Offer to create a feature branch (git checkout -b feat/PROJ-123-slug)
 ```
 
+### Required Fields & Custom Fields
+
+Step 1b reads ALL required fields for the chosen issue type. Before drafting:
+
+- **List every required field** and check which ones already have values (from user input or defaults like assignee, priority)
+- **If any required field has no value** (especially custom fields like `customfield_10079`), use `AskUserQuestion` to ask the user for the missing values. Do NOT attempt to create the issue with missing required fields.
+- Include discovered required fields in the final confirmation preview (Step 7)
+
+**Fallback when creation still fails:** If `createJiraIssue` rejects due to a required field despite passing it via `additionalFields`, create as **Task** first (fewer required fields), then use `editJiraIssue` with `fields` (object, not string) to change issue type and set the custom field. Report the workaround to the user.
+
 <HARD-GATE>
-Before creating or updating issue content, use `AskUserQuestion` to present a structured confirmation. Show the full draft (title, type, description, labels, priority) in the `markdown` preview field. Options: "Submit" (Recommended), "Edit", "Cancel". Do NOT call any Jira write tool without explicit user approval via this confirmation. Status-only transitions skip this gate.
+Before creating or updating issue content, you MUST use `AskUserQuestion` to present a structured confirmation. Show the full draft (title, type, sprint, description, labels, priority, and all required fields) in the `markdown` preview field. Options: "Submit" (Recommended), "Edit", "Cancel". Do NOT call any Jira write tool without explicit user approval via this confirmation. This is NOT optional — text-based confirmation ("确认创建？") does NOT satisfy this gate. You MUST call the `AskUserQuestion` tool. Status-only transitions skip this gate.
 </HARD-GATE>
 
 ## Agile Workflow

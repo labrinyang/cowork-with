@@ -79,7 +79,7 @@ Split Confluence operations between a **haiku subagent** (reads) and the **main 
 Comments on existing pages follow the same gate as page updates: verify creator first, then confirm with user.
 
 <HARD-GATE>
-Before creating or updating page content, use `AskUserQuestion` to present a structured confirmation. Show title, parent page, and body content in the `markdown` preview field. Options: "Submit" (Recommended), "Edit", "Cancel". Do NOT call any Confluence write tool without explicit user approval via this confirmation.
+Before creating or updating page content, you MUST use `AskUserQuestion` to present a structured confirmation. Show title, parent page, and body content in the `markdown` preview field. Options: "Submit" (Recommended), "Edit", "Cancel". Do NOT call any Confluence write tool without explicit user approval via this confirmation. This is NOT optional — text-based confirmation does NOT satisfy this gate. You MUST call the `AskUserQuestion` tool.
 </HARD-GATE>
 
 ## CQL Quick Reference

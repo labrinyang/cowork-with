@@ -15,6 +15,8 @@ MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onbo
 
 When a Figma URL appears — in conversation, a Jira issue description, or a wiki page — use the haiku subagent to extract design context automatically. Pass the full Figma URL directly to `get_design_context`; the tool extracts the relevant node.
 
+**Node ID format:** Figma node IDs use **colon** separators: `23102:138594`. If a URL contains a dash-formatted node (e.g., `node-id=23102-138594`), convert dashes to colons when passing `nodeId` to any tool: `"23102:138594"`.
+
 ## Tool Strategy
 
 Split Figma operations between a **haiku subagent** (reads) and the **main model** (writes):
@@ -48,7 +50,7 @@ Split Figma operations between a **haiku subagent** (reads) and the **main model
 - `create_design_system_rules` — generate rule file for consistent code output
 
 <HARD-GATE>
-Before applying generated code, use `AskUserQuestion` to present a structured confirmation. Show the design context source (Figma URL, frame name) and the generated code in the `markdown` preview field. Options: "Apply" (Recommended), "Edit", "Cancel". Do NOT write code from Figma designs without explicit user approval via this confirmation.
+Before applying generated code, you MUST use `AskUserQuestion` to present a structured confirmation. Show the design context source (Figma URL, frame name) and the generated code in the `markdown` preview field. Options: "Apply" (Recommended), "Edit", "Cancel". Do NOT write code from Figma designs without explicit user approval via this confirmation. This is NOT optional — text-based confirmation does NOT satisfy this gate. You MUST call the `AskUserQuestion` tool.
 </HARD-GATE>
 
 ## Cross-Skill Integration

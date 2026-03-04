@@ -1,6 +1,6 @@
 {
   "name": "cowork-with",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, and code into one workflow loop inside Claude Code.",
   "author": {
     "name": "labrinyang",

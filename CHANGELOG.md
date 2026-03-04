@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.2 (2026-03-04)
+
+### Changed
+- Simplify Jira and Wiki skill files — remove redundant Quick Reference tables, merge overlapping sections, consolidate flow diagrams (-33% lines, all functionality preserved)
+
 ## 2.1.1 (2026-03-04)
 
 ### Changed

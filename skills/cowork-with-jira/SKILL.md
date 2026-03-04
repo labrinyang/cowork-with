@@ -9,13 +9,7 @@ Agile Jira workflow for Claude Code via the Atlassian Rovo MCP server.
 
 ## Prerequisites
 
-Ensure the Atlassian Rovo MCP server is configured. Quick check:
-
-```bash
-claude mcp list
-```
-
-If `atlassian` is not listed, run `/cowork-with:cowork-with-onboarding`.
+The Atlassian Rovo MCP server is automatically configured by the plugin. If authentication hasn't been completed yet, run `/cowork-with:cowork-with-onboarding`.
 
 ## Issue Conventions
 

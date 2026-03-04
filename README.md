@@ -28,10 +28,9 @@ After installing the plugin, press `Ctrl+C` to exit and restart Claude Code. The
 ```
 
 This walks you through:
-1. Adding the Atlassian Rovo MCP server
-2. Restarting Claude Code
-3. Verifying the connection (triggers OAuth automatically)
-4. Configuring permissions (optional)
+1. Verifying the MCP server (auto-configured by the plugin)
+2. Authenticating with Jira (OAuth browser flow)
+3. Configuring permissions (optional)
 
 ## Usage
 
@@ -62,6 +61,7 @@ Fix the bug in...        <- commit triggers task closure check
 ```
 cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
+├── .mcp.json                     # Atlassian Rovo MCP server (auto-configured)
 ├── skills/
 │   ├── cowork-with-onboarding/SKILL.md  # Setup guide
 │   └── cowork-with-jira/SKILL.md        # Main Jira workflow
@@ -76,7 +76,7 @@ cowork-with/
 - Sprint-aware: query active sprint items via JQL
 - Epic management: create epics, link stories
 - Post-commit hook: automated task closure check
-- Direct MCP integration: no CLI installation required
+- Auto-configured MCP server: no manual setup required
 - Preview before submit: always shows draft for confirmation
 
 ## Limitations

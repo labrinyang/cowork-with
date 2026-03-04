@@ -8,13 +8,13 @@
 - Removed `reference/` directory (MCP tools are self-documenting)
 
 ### Added
-- Atlassian Rovo MCP integration (`https://mcp.atlassian.com/v1/sse`)
+- Atlassian Rovo MCP integration via plugin `.mcp.json` (auto-configured on plugin load)
 - User lookup section (`lookupJiraAccountId` for non-self assignees)
 - Limitations section documenting operations that require Jira web UI
 - All 13 Jira MCP tools: `getJiraIssue`, `searchJiraIssuesUsingJql`, `createJiraIssue`, `editJiraIssue`, `transitionJiraIssue`, `addCommentToJiraIssue`, `addWorklogToJiraIssue`, `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFieldsData`, `getTransitionsForJiraIssue`, `getJiraIssueRemoteIssueLinks`, `lookupJiraAccountId`
 
 ### Changed
-- Onboarding simplified from 5 steps to 3 (add MCP server, restart, verify)
+- Onboarding simplified from 5 steps to 3 (verify MCP, authenticate OAuth, optional permissions)
 - Tool strategy: main model calls MCP directly instead of haiku subagent
 - Post-commit hook references MCP tools instead of acli commands
 - Setup no longer requires Homebrew or acli installation

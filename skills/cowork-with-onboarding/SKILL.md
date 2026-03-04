@@ -9,37 +9,27 @@ allowed-tools: Bash, Read, AskUserQuestion
 
 Walk the user through setting up their environment for the cowork-with plugin. Check each step and skip any that are already complete.
 
-## Step 1: Add the Atlassian Rovo MCP Server
+## Step 1: Verify MCP Server
 
-Check if the MCP server is already configured:
+The Atlassian Rovo MCP server is automatically configured by the plugin. Verify it's loaded:
 
 ```bash
 claude mcp list
 ```
 
-If `atlassian` is not listed, add it:
+If `atlassian` appears in the list, the server is ready. If not, the plugin may not have loaded correctly — ask the user to restart Claude Code and re-run this onboarding.
 
-```bash
-claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
-```
+## Step 2: Authenticate with Jira
 
-## Step 2: Restart Claude Code
+Call any Atlassian MCP tool (e.g., `getVisibleJiraProjects`) to trigger the OAuth browser flow:
 
-The MCP server won't be available until Claude Code is restarted. Tell the user:
-
-> Press **Ctrl+C** to exit Claude Code, then relaunch it.
-
-## Step 3: Verify Connection
-
-After restart, call any Atlassian MCP tool (e.g., `getVisibleJiraProjects`). This will trigger the OAuth browser flow automatically on first use:
-
-1. A browser window opens
+1. A browser window opens automatically
 2. The user selects their Atlassian site and grants access
-3. Authentication completes automatically
+3. Authentication completes — the tool call returns Jira data
 
-If the tool call succeeds, setup is complete.
+If the tool call succeeds, authentication is complete.
 
-## Step 4: Claude Code Permissions (Optional)
+## Step 3: Claude Code Permissions (Optional)
 
 For a smoother workflow, suggest adding Atlassian MCP tools to the project's allow list. Show the user what to add to `.claude/settings.json` or `.claude/settings.local.json`:
 

@@ -21,28 +21,30 @@ For product doc queries, navigate from root via `getConfluencePageDescendants`.
 ## Write Safety
 
 <HARD-GATE>
-Before ANY write operation to an existing page (`updateConfluencePage`, `createConfluenceFooterComment`, `createConfluenceInlineComment`), the haiku subagent MUST first read the target page using `getConfluencePage` and verify the page creator. If the page was NOT created by the current user, REFUSE the write and explain why. Only pages created by "me" (the current authenticated user) may be modified. This applies to ALL write operations on existing pages without exception.
+Before ANY write operation to an existing page (`updateConfluencePage`, `createConfluenceFooterComment`, `createConfluenceInlineComment`), the `explorer` agent MUST first read the target page using `getConfluencePage` and verify the page creator. If the page was NOT created by the current user, REFUSE the write and explain why. Only pages created by "me" (the current authenticated user) may be modified. This applies to ALL write operations on existing pages without exception.
 </HARD-GATE>
 
 New page creation skips the creator check (current user is the creator), but always confirm with the user before creating.
 
 ## Tool Strategy
 
-Split Confluence operations between a **haiku subagent** (reads) and the **main model** (writes):
+Split Confluence operations between the **`explorer` agent** (reads) and the **main model** (writes).
 
-| Task | Who | Why |
-|------|-----|-----|
-| Read pages, search, list spaces | Haiku subagent | Cheap, fast, keeps main context clean |
-| Browse page tree (descendants) | Haiku subagent | May require multiple calls |
-| Read comments (footer, inline) | Haiku subagent | Informational reads |
-| Verify page creator before writes | Haiku subagent | Safety check via getConfluencePage |
-| Draft page content | Main model | Requires quality writing |
-| Preview to user and get confirmation | Main model | User interaction |
-| Write to Confluence (create, update, comment) | Main model | Requires user confirmation + creator check |
+Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, read-only tools, all MCP read access).
+
+| Task | Who |
+|------|-----|
+| Read pages, search, list spaces | `explorer` agent |
+| Browse page tree (descendants) | `explorer` agent |
+| Read comments (footer, inline) | `explorer` agent |
+| Verify page creator before writes | `explorer` agent |
+| Draft page content | Main model |
+| Preview to user and get confirmation | Main model |
+| Write to Confluence (create, update, comment) | Main model |
 
 ### MCP Tools
 
-**Read** (haiku subagent):
+**Read** (`explorer` agent):
 - `getConfluencePage` — get a page by ID, body returned as Markdown
 - `getConfluencePageDescendants` — list child pages under a parent
 - `getConfluencePageFooterComments` — list footer comments on a page
@@ -60,7 +62,7 @@ Split Confluence operations between a **haiku subagent** (reads) and the **main 
 ### Update Page Flow
 
 ```
-1. Haiku subagent   → Read page to get current content AND verify creator (getConfluencePage)
+1. `explorer` agent   → Read page to get current content AND verify creator (getConfluencePage)
 2. HARD-GATE        → If creator != current user, REFUSE and stop
 3. Main model       → Draft updated content
 4. Main model       → Preview changes to user for confirmation
@@ -70,7 +72,7 @@ Split Confluence operations between a **haiku subagent** (reads) and the **main 
 ### Create Page Flow
 
 ```
-1. Haiku subagent   → Read parent page to verify location (getConfluencePage)
+1. `explorer` agent   → Read parent page to verify location (getConfluencePage)
 2. Main model       → Draft page title and content
 3. Main model       → Preview to user for confirmation
 4. Main model       → Create page after user approves (createConfluencePage)
@@ -96,7 +98,7 @@ Before creating or updating page content, you MUST use `AskUserQuestion` to pres
 ## Cross-Skill Integration
 
 - If product documentation is missing or outdated, suggest creating a Jira issue via `/cowork-with:cowork-with-jira` with type Task and label `documentation`.
-- When reading a wiki page, use the haiku subagent to search Jira for related issues via `searchJiraIssuesUsingJql`.
+- When reading a wiki page, use the `explorer` agent to search Jira for related issues via `searchJiraIssuesUsingJql`.
 - If a wiki page references Figma designs, use `/cowork-with:cowork-with-figma` to extract design specs for implementation.
 
 ## Limitations

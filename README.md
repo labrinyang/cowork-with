@@ -80,7 +80,7 @@ Extract the design tokens from...    <- colors, spacing, typography
 └───────────────┘  └─────────────────────┘  └─────────────────────┘  └──────────────────┘
 ```
 
-1. **Pull task context** — haiku subagent reads Jira tasks, wiki specs, and Figma designs
+1. **Pull task context** — `explorer` agent (haiku) reads Jira tasks, wiki specs, and Figma designs
 2. **Brainstorm** — suggests `/superpowers:brainstorming` if installed
 3. **Work** — you code as usual, with full PM + design context available
 4. **Commit** — post-commit hook checks if in-progress tasks should be closed
@@ -92,6 +92,8 @@ Extract the design tokens from...    <- colors, spacing, typography
 cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
 ├── .mcp.json                     # Atlassian + Figma MCP servers (auto-configured)
+├── agents/
+│   └── explorer.md               # Haiku read-only subagent for all MCP reads
 ├── skills/
 │   ├── cowork-with-onboarding/SKILL.md  # Setup guide
 │   ├── cowork-with-jira/SKILL.md        # Jira workflow
@@ -114,7 +116,7 @@ cowork-with/
 - Cross-skill linking: Jira issues with Figma URLs auto-read design context
 - Post-commit hook: automated task closure with @creator notification
 - Auto-configured MCP servers: no manual setup required
-- Subagent strategy: haiku reads Jira/wiki/Figma, main model writes (with user confirmation)
+- Explorer agent: haiku-powered read-only subagent for all MCP reads (Jira/wiki/Figma/codebase)
 - Preview before submit: always shows draft for confirmation
 
 ## Limitations

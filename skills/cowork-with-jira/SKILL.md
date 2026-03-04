@@ -36,7 +36,7 @@ Do not skip Acceptance Criteria. Even for small tasks, at least one criterion is
 
 ### Issue Type Selection
 
-Issue type names are **localized** — a project may use `"Bug"`, `"缺陷 Bug"`, `"バグ"`, etc. **Always** use a haiku subagent to call `getJiraProjectIssueTypesMetadata` first and use the exact type name returned.
+Issue type names are **localized** — a project may use `"Bug"`, `"缺陷 Bug"`, `"バグ"`, etc. **Always** use the `explorer` agent to call `getJiraProjectIssueTypesMetadata` first and use the exact type name returned.
 
 | Intent | Jira Type | Label | When to use |
 |--------|-----------|-------|-------------|
@@ -58,7 +58,7 @@ Always assign to `@me` unless the user specifies a different assignee.
 
 ### User Lookup
 
-When assigning to someone other than `@me`, use a haiku subagent to call `lookupJiraAccountId` to resolve their name or email to an account ID before creating or editing the issue.
+When assigning to someone other than `@me`, use the `explorer` agent to call `lookupJiraAccountId` to resolve their name or email to an account ID before creating or editing the issue.
 
 ### Default Priority
 
@@ -87,24 +87,25 @@ To Do → In Progress → In Review → Done
 
 **Proactive transitions:** When context makes it obvious (e.g., user says "I'm working on PROJ-42"), transition to In Progress without asking.
 
-**Custom workflow handling:** If a transition fails, use a haiku subagent to call `getTransitionsForJiraIssue` to inspect available transitions and pick the closest match. Report the actual status name to the user.
+**Custom workflow handling:** If a transition fails, use the `explorer` agent to call `getTransitionsForJiraIssue` to inspect available transitions and pick the closest match. Report the actual status name to the user.
 
 ## Tool Strategy
 
-Split Jira operations between a **haiku subagent** (reads) and the **main model** (writes):
+Split Jira operations between the **`explorer` agent** (reads) and the **main model** (writes).
 
-| Task | Who | Why |
-|------|-----|-----|
-| Read from Jira (search, view, metadata) | Haiku subagent | Cheap, fast, keeps main context clean |
-| Read git/gh context (branch, log, diff, PRs) | Main model | Local CLI, fast, informs drafting |
-| Explore codebase for issue context | Explore subagent | Efficient file search |
-| Draft issue content (title, description, criteria) | Main model | Requires quality writing |
-| Preview to user and get confirmation | Main model | User interaction |
-| Write to Jira (create, edit, transition, comment) | Main model | Requires user confirmation first |
+Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, read-only tools, all MCP read access).
+
+| Task | Who |
+|------|-----|
+| Read from Jira (search, view, metadata) | `explorer` agent |
+| Read git/gh context, explore codebase | `explorer` agent |
+| Draft issue content (title, description, criteria) | Main model |
+| Preview to user and get confirmation | Main model |
+| Write to Jira (create, edit, transition, comment) | Main model |
 
 ### MCP Tools
 
-**Read** (haiku subagent):
+**Read** (`explorer` agent):
 - `getJiraIssue` — read a single issue (param: `issueIdOrKey`)
 - `searchJiraIssuesUsingJql` — search issues with JQL (param: `maxResults` must be **number**, not string)
 - `getVisibleJiraProjects` — list projects
@@ -124,7 +125,7 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 ### Issue Creation Flow
 
 ```
-1. Haiku subagent        → Read project metadata:
+1. `explorer` agent        → Read project metadata:
                            a. getJiraProjectIssueTypesMetadata (exact localized type names)
                            b. getJiraIssueTypeMetaWithFieldsData (ALL required fields incl. custom)
                            c. searchJiraIssuesUsingJql "sprint in openSprints()" (active sprint)
@@ -132,7 +133,7 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
                            If ANY required field is missing → ask user via AskUserQuestion BEFORE drafting
 3. Main model            → Ask user which sprint to assign (show active sprint name), or skip
 4. Main model            → Read git context if relevant (branch, recent commits, diff)
-5. Explore subagent      → Search codebase if needed for context
+5. `explorer` agent      → Search codebase if needed for context
 6. Main model            → Draft title, description (plain text!), acceptance criteria
 7. Main model            → Preview FULL draft to user via AskUserQuestion (HARD-GATE below)
 8. Main model            → Create issue after user approves (createJiraIssue)
@@ -161,7 +162,7 @@ Before creating or updating issue content, you MUST use `AskUserQuestion` to pre
 - Link story to epic: set the parent field when creating, or use `editJiraIssue` after creation
 - Epic titles are plain descriptive text (e.g., "OAuth Integration", "Payment System Overhaul")
 - If work spans 3+ related stories, create an epic first
-- Before creating, use haiku subagent to check existing epics:
+- Before creating, use `explorer` agent to check existing epics:
   ```
   searchJiraIssuesUsingJql with JQL: "project = PROJ AND issuetype = Epic AND status != Done"
   ```
@@ -170,8 +171,8 @@ Before creating or updating issue content, you MUST use `AskUserQuestion` to pre
 
 The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's job).
 
-- **Check active sprint:** use haiku subagent to query via JQL `sprint in openSprints()`
-- **When user asks "what am I working on?"**, use haiku subagent to search:
+- **Check active sprint:** use `explorer` agent to query via JQL `sprint in openSprints()`
+- **When user asks "what am I working on?"**, use `explorer` agent to search:
   ```
   searchJiraIssuesUsingJql with JQL: "sprint in openSprints() AND assignee = currentUser()"
   ```
@@ -201,7 +202,7 @@ The current repo's git and GitHub state is available as context. Use it naturall
 
 After a git commit, the plugin's hook injects context about checking task status. When this happens:
 
-1. Use haiku subagent to search in-progress tasks assigned to the user:
+1. Use `explorer` agent to search in-progress tasks assigned to the user:
    ```
    searchJiraIssuesUsingJql with JQL: "status = 'In Progress' AND assignee = currentUser()"
    ```

@@ -13,26 +13,28 @@ MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onbo
 
 ## Design Context from URLs
 
-When a Figma URL appears — in conversation, a Jira issue description, or a wiki page — use the haiku subagent to extract design context automatically. Pass the full Figma URL directly to `get_design_context`; the tool extracts the relevant node.
+When a Figma URL appears — in conversation, a Jira issue description, or a wiki page — use the `explorer` agent to extract design context automatically. Pass the full Figma URL directly to `get_design_context`; the tool extracts the relevant node.
 
 **Node ID format:** Figma node IDs use **colon** separators: `23102:138594`. If a URL contains a dash-formatted node (e.g., `node-id=23102-138594`), convert dashes to colons when passing `nodeId` to any tool: `"23102:138594"`.
 
 ## Tool Strategy
 
-Split Figma operations between a **haiku subagent** (reads) and the **main model** (writes):
+Split Figma operations between the **`explorer` agent** (reads) and the **main model** (writes).
+
+Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, read-only tools, all MCP read access).
 
 | Task | Who |
 |------|-----|
-| Read design context, tokens, metadata | Haiku subagent |
-| Take screenshots for visual reference | Haiku subagent |
-| Inspect Code Connect mappings | Haiku subagent |
+| Read design context, tokens, metadata | `explorer` agent |
+| Take screenshots for visual reference | `explorer` agent |
+| Inspect Code Connect mappings | `explorer` agent |
 | Generate code from design context | Main model |
 | Preview to user and get confirmation | Main model |
 | Write to Figma (generate design, diagrams, Code Connect) | Main model |
 
 ### MCP Tools
 
-**Read** (haiku subagent):
+**Read** (`explorer` agent):
 - `get_design_context` — structured code from frames/components (React + Tailwind default)
 - `get_variable_defs` — design tokens: colors, spacing, typography
 - `get_code_connect_map` — existing component-to-code mappings

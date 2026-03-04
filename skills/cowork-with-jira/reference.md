@@ -68,6 +68,15 @@ After a git commit, the plugin's hook injects context about checking task status
 
 4. If user declines, leave the task as-is.
 
+### Branch Naming
+
+```
+feat/PROJ-123-short-description
+fix/PROJ-123-short-description
+```
+
+Include the issue key in the branch name. Jira auto-tracks branches, commits, and PRs that contain the issue key — no manual linking required.
+
 ### Commit Message Format
 
 ```

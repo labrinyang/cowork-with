@@ -163,6 +163,7 @@ For epics, sprints, sub-tasks, post-commit hook, and commit message format, see 
 
 Key rules (always apply):
 - **Sprints:** Never auto-add issues to a sprint — let the user decide
+- **Branch names:** Include the issue key — `feat/PROJ-123-slug` or `fix/PROJ-123-slug`. Jira auto-tracks branches containing the issue key.
 - **Commit messages:** `[PROJ-123] commit message` when related to a task
 - **Post-commit:** Hook auto-triggers task closure check; use `explorer` agent to find related in-progress tasks
 

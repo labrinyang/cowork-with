@@ -2,6 +2,8 @@
 
 Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, Figma designs, and code into one workflow loop inside Claude Code — so the AI agent understands what to build, why, and when to close the loop.
 
+Works for **teams** and **solo developers**. A single developer running multiple Claude Code terminals gets shared context across sessions — every terminal can pull the same Jira tasks, wiki specs, and Figma designs without copy-pasting URLs or issue numbers between windows.
+
 ## Why
 
 When developers work with AI agents, the agent only sees code. It doesn't know what the PM specified, what tasks are in the sprint, what the product docs say, or what the design looks like. This plugin bridges that gap:
@@ -11,6 +13,7 @@ When developers work with AI agents, the agent only sees code. It doesn't know w
 - **Dev → PM**: Auto-close tasks on commit, comment @creator
 - **Dev → QA**: Link commits to issues with structured descriptions
 - **QA → Dev**: Surface related issues and doc gaps during development
+- **Terminal → Terminal**: Shared context across multiple Claude Code sessions — one creates the issue, another implements it, both see the same task state
 
 ## Install
 

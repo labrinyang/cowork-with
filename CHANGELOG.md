@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.0 (2026-03-04)
+
+### Changed
+- Plugin positioning: works for teams AND solo developers across multiple terminals
+- Description updated: shared context across Claude Code sessions
+- README: added multi-terminal solo dev use case, Terminal → Terminal context flow
+
 ## 2.4.2 (2026-03-04)
 
 ### Fixed

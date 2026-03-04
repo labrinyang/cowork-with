@@ -1,6 +1,8 @@
 ---
 name: cowork-with-figma
 description: Use when the user works with or mentions Figma designs, prototypes, mockups, UI specs, design tokens, or design-to-code workflows
+argument-hint: "[figma-url]"
+allowed-tools: Read, Glob, Grep, Bash, Agent, AskUserQuestion
 ---
 
 # Figma Workflow

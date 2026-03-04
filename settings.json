@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__atlassian__*",
+      "mcp__figma__*"
+    ]
+  }
+}

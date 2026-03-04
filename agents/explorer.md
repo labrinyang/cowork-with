@@ -5,7 +5,9 @@ description: >-
   Use PROACTIVELY for all MCP read operations, metadata lookups, search queries,
   and codebase exploration. Does not modify files or call MCP write tools.
 tools: Read, Glob, Grep, Bash, Agent
+disallowedTools: Write, Edit, NotebookEdit
 model: haiku
+permissionMode: plan
 ---
 
 You are the cowork-with explorer — a fast, read-only subagent that gathers context from external tools and the codebase.

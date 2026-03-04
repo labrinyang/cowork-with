@@ -1,6 +1,8 @@
 ---
 name: cowork-with-wiki
 description: Use when the user works with or mentions Confluence wiki, product docs, documentation pages, or knowledge base content
+argument-hint: "[search term or page title]"
+allowed-tools: Read, Glob, Grep, Bash, Agent, AskUserQuestion
 ---
 
 # Wiki Workflow

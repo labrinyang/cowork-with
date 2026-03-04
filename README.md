@@ -49,7 +49,7 @@ Fix the bug in...        <- commit triggers task closure check
 
 ## How It Works
 
-1. **Pull task context** — reads Jira via MCP tools
+1. **Pull task context** — haiku subagent reads Jira via MCP tools
 2. **Brainstorm** — suggests `/superpowers:brainstorming` if installed
 3. **Work** — you code as usual
 4. **Commit** — post-commit hook checks if in-progress tasks should be closed
@@ -76,6 +76,7 @@ cowork-with/
 - Epic management: create epics, link stories
 - Post-commit hook: automated task closure check
 - Auto-configured MCP server: no manual setup required
+- Subagent strategy: haiku reads Jira, main model writes (with user confirmation)
 - Preview before submit: always shows draft for confirmation
 
 ## Limitations

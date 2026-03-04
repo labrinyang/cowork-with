@@ -63,7 +63,7 @@ Always assign to `@me` unless the user specifies a different assignee.
 
 ### User Lookup
 
-When assigning to someone other than `@me`, use `lookupJiraAccountId` to resolve their name or email to an account ID before creating or editing the issue.
+When assigning to someone other than `@me`, use a haiku subagent to call `lookupJiraAccountId` to resolve their name or email to an account ID before creating or editing the issue.
 
 ### Default Priority
 
@@ -110,46 +110,65 @@ To Do → In Progress → In Review → Done
 
 **Proactive transitions:** When context makes it obvious (e.g., user says "I'm working on PROJ-42" or "let's start PROJ-42"), transition to In Progress without asking.
 
-**Custom workflow handling:** If a transition fails (project uses custom workflow), use `getTransitionsForJiraIssue` to inspect the issue's available transitions and pick the closest match. Report the actual status name to the user.
+**Custom workflow handling:** If a transition fails (project uses custom workflow), use a haiku subagent to call `getTransitionsForJiraIssue` to inspect the issue's available transitions and pick the closest match. Report the actual status name to the user.
 
 ## Tool Strategy
 
-All Jira operations use MCP tools directly from the main model — no subagent needed.
+Split Jira operations between a **haiku subagent** (reads) and the **main model** (writes):
 
-| Task | Approach |
-|------|----------|
-| Read from Jira (search, view) | MCP tools: `getJiraIssue`, `searchJiraIssuesUsingJql` |
-| Write to Jira (create, edit, transition) | MCP tools: `createJiraIssue`, `editJiraIssue`, `transitionJiraIssue` |
-| Comments | MCP tool: `addCommentToJiraIssue` |
-| Project metadata | MCP tools: `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFieldsData` |
-| Explore codebase for issue context | Explore subagent |
-| Draft issue content (title, description, criteria) | Main model |
+| Task | Who | Why |
+|------|-----|-----|
+| Read from Jira (search, view, metadata) | Haiku subagent | Cheap, fast, keeps main context clean |
+| Explore codebase for issue context | Explore subagent | Efficient file search |
+| Draft issue content (title, description, criteria) | Main model | Requires quality writing |
+| Preview to user and get confirmation | Main model | User interaction |
+| Write to Jira (create, edit, transition, comment) | Main model | Requires user confirmation first |
+
+### Haiku Subagent — Jira Reader
+
+Use the Agent tool with `model: "haiku"` for all Jira read operations. The subagent has access to Atlassian MCP tools and returns structured data to the main model.
+
+**Read MCP tools** (haiku subagent):
+- `getJiraIssue` — read a single issue
+- `searchJiraIssuesUsingJql` — search issues with JQL
+- `getVisibleJiraProjects` — list projects
+- `getJiraProjectIssueTypesMetadata` — issue types for a project
+- `getJiraIssueTypeMetaWithFieldsData` — field metadata for an issue type
+- `getTransitionsForJiraIssue` — available status transitions
+- `getJiraIssueRemoteIssueLinks` — remote links on an issue
+- `lookupJiraAccountId` — resolve user name/email to account ID
+
+**Write MCP tools** (main model, after user confirmation):
+- `createJiraIssue` — create a new issue
+- `editJiraIssue` — update an existing issue
+- `transitionJiraIssue` — change issue status
+- `addCommentToJiraIssue` — add a comment
+- `addWorklogToJiraIssue` — log work time
 
 ### Issue Creation Flow
 
 ```
-1. MCP: searchJiraIssuesUsingJql → Identify active sprint / existing issues
-2. MCP: getVisibleJiraProjects   → Confirm project key
-3. Explore subagent              → Search codebase if needed for context
-4. Main model                    → Draft title, description, acceptance criteria
-5. Preview to user               → Show full draft for confirmation
-6. MCP: createJiraIssue          → Create issue after user approves
+1. Haiku subagent        → Read Jira context (search existing issues, confirm project, check sprint)
+2. Explore subagent      → Search codebase if needed for context
+3. Main model            → Draft title, description, acceptance criteria
+4. Main model            → Preview to user for confirmation
+5. Main model            → Create issue after user approves (createJiraIssue)
 ```
 
 ### Issue Update Flow
 
 ```
-1. MCP: getJiraIssue        → Read current issue state
-2. Main model               → Determine changes, draft new content if needed
-3. Preview to user          → Show changes for confirmation (content changes only)
-4. MCP: editJiraIssue       → Apply updates
+1. Haiku subagent        → Read current issue state (getJiraIssue)
+2. Main model            → Determine changes, draft new content if needed
+3. Main model            → Preview changes to user for confirmation
+4. Main model            → Apply updates after user approves (editJiraIssue)
 ```
 
 ### Status Transitions
 
 ```
-1. MCP: getTransitionsForJiraIssue → Get available transitions
-2. MCP: transitionJiraIssue        → Apply transition
+1. Haiku subagent        → Get available transitions (getTransitionsForJiraIssue)
+2. Main model            → Apply transition (transitionJiraIssue)
 ```
 
 ### Key Rules
@@ -159,6 +178,8 @@ Always preview issue content before submission. Show title, type, description, l
 </HARD-GATE>
 
 - **Status-only transitions skip preview** — apply directly.
+- **All Jira reads go through haiku subagent** — never read from Jira directly in the main model.
+- **All Jira writes stay in the main model** — ensures user confirmation before any mutation.
 
 ## Agile Workflow
 
@@ -166,11 +187,11 @@ Always preview issue content before submission. Show title, type, description, l
 
 Epics group related stories under a theme or feature area.
 
-- Create epic: `createJiraIssue` with type "Epic"
+- Create epic: `createJiraIssue` with type "Epic" (main model, after user confirms)
 - Link story to epic: set the parent field when creating, or use `editJiraIssue` after creation
 - Epic titles are plain descriptive text (e.g., "OAuth Integration", "Payment System Overhaul")
 - If work spans 3+ related stories, create an epic first
-- Before creating, check existing epics:
+- Before creating, use haiku subagent to check existing epics:
   ```
   searchJiraIssuesUsingJql with JQL: "project = PROJ AND issuetype = Epic AND status != Done"
   ```
@@ -179,8 +200,8 @@ Epics group related stories under a theme or feature area.
 
 The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's job).
 
-- **Check active sprint:** query via JQL `sprint in openSprints()`
-- **When user asks "what am I working on?"**, search:
+- **Check active sprint:** use haiku subagent to query via JQL `sprint in openSprints()`
+- **When user asks "what am I working on?"**, use haiku subagent to search:
   ```
   searchJiraIssuesUsingJql with JQL: "sprint in openSprints() AND assignee = currentUser()"
   ```
@@ -191,13 +212,13 @@ The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's
 
 ### Sub-tasks
 
-Break down stories into discrete pieces using `createJiraIssue` with type "Sub-task" and the parent field set to the parent issue key.
+Break down stories into discrete pieces using `createJiraIssue` with type "Sub-task" and the parent field set to the parent issue key (main model, after user confirms).
 
 Sub-tasks inherit the parent's sprint and epic.
 
 ## Brainstorming Integration
 
-After reading task context from Jira, ask the user:
+After reading task context from Jira (via haiku subagent), ask the user:
 
 > "Would you like to brainstorm implementation approaches?"
 
@@ -211,7 +232,7 @@ If not installed, proceed with normal conversation-based discussion.
 
 After a git commit, the plugin's hook injects context about checking task status. When this happens:
 
-1. Search in-progress tasks assigned to the user:
+1. Use haiku subagent to search in-progress tasks assigned to the user:
    ```
    searchJiraIssuesUsingJql with JQL: "status = 'In Progress' AND assignee = currentUser()"
    ```
@@ -220,8 +241,8 @@ After a git commit, the plugin's hook injects context about checking task status
    > "Should I close PROJ-123 (task summary)?"
 
 3. If user approves:
-   - Transition to **Done** using `transitionJiraIssue`
-   - Add a comment summarizing the work using `addCommentToJiraIssue`
+   - Transition to **Done** using `transitionJiraIssue` (main model)
+   - Add a comment summarizing the work using `addCommentToJiraIssue` (main model)
    - If the issue was **NOT created by the current user**, @mention the creator in the comment
    - If the issue **was** created by the current user, skip the @mention
 
@@ -260,7 +281,7 @@ The following operations are **not available** via MCP and require the Jira web 
 | Issue description | Background + Acceptance Criteria |
 | Issue type | Story / Bug / Task / Epic / Sub-task |
 | Assign issue | Default to `@me` |
-| User lookup | `lookupJiraAccountId` for non-self assignees |
+| User lookup | Haiku subagent → `lookupJiraAccountId` |
 | Label | Lowercase matching issue type |
 | Priority | Default Medium |
 | New issue status | To Do (project default) |
@@ -268,8 +289,9 @@ The following operations are **not available** via MCP and require the Jira web 
 | Code in review | Transition to In Review |
 | Commit closes issue | Transition to Done (user approval required) |
 | Close comment | @mention creator if not self-created |
-| All Jira operations | MCP tools called directly (no subagent) |
+| Read from Jira | Haiku subagent (cheap, fast) |
+| Write to Jira | Main model (user confirmation first) |
 | Draft content | Main model, preview before submit |
 | Related stories | Group under an Epic |
-| Sprint queries | JQL: `sprint in openSprints()` |
+| Sprint queries | Haiku subagent → JQL: `sprint in openSprints()` |
 | Brainstorming | Suggest `/superpowers:brainstorming` if available |

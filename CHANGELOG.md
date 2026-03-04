@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.2 (2026-03-04)
+
+### Fixed
+- Remove unsupported `agents`, `skills`, `hooks`, `mcpServers` path fields from plugin.json — Claude Code auto-discovers from standard directories
+- Revert explorer agent scope split — explorer keeps code reading alongside MCP reads
+
 ## 2.4.1 (2026-03-04)
 
 ### Changed

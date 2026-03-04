@@ -97,13 +97,12 @@ To Do → In Progress → In Review → Done
 ALL MCP read tool calls MUST go through the `explorer` agent. The main model MUST NOT call any MCP read tool directly — always spawn the `explorer` agent to do it. This is mandatory because the explorer agent enforces correct parameter types and names. Calling MCP read tools directly from the main model is forbidden.
 </HARD-GATE>
 
-Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, MCP reads + git only, no code file access).
+Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, read-only: MCP reads + codebase + git).
 
 | Task | Who |
 |------|-----|
 | Read from Jira (search, view, metadata) | `explorer` agent |
-| Read git/gh context (branch, log, diff, PRs) | `explorer` agent |
-| Explore codebase for issue context | Explore subagent (`subagent_type: "Explore"`) |
+| Read git/gh context, explore codebase | `explorer` agent |
 | Draft issue content (title, description, criteria) | Main model |
 | Preview to user and get confirmation | Main model |
 | Write to Jira (create, edit, transition, comment) | Main model |
@@ -137,8 +136,7 @@ Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.
 2. Main model            → Compare required fields vs. known values
                            If ANY required field is missing → ask user via AskUserQuestion BEFORE drafting
 3. Main model            → Ask user which sprint to assign (show active sprint name), or skip
-4. `explorer` agent      → Read git context if relevant (branch, recent commits, diff)
-5. Explore subagent      → Search codebase if needed for context
+4. `explorer` agent      → Read git context + search codebase if needed for context
 6. Main model            → Draft title, description (plain text!), acceptance criteria
 7. Main model            → Preview FULL draft to user via AskUserQuestion (HARD-GATE below)
 8. Main model            → Create issue after user approves (createJiraIssue)

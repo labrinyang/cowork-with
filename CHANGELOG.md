@@ -3,8 +3,7 @@
 ## 2.4.1 (2026-03-04)
 
 ### Changed
-- Explorer agent: strip code reading (Read, Glob, Grep → disallowedTools), now MCP reads + git only
-- Codebase exploration separated to built-in Explore subagent (`subagent_type: "Explore"`)
+- Revert explorer agent scope split — explorer keeps code reading (Read, Glob, Grep) alongside MCP reads, since many tasks need both MCP data + code context in one pass
 
 ## 2.4.0 (2026-03-04)
 

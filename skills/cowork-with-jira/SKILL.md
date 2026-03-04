@@ -211,6 +211,7 @@ Include the Jira issue key in the commit message when the commit is related to a
 
 - After reading task context, offer `/superpowers:brainstorming` to explore implementation approaches.
 - If implementation reveals undocumented product behavior, suggest `/cowork-with:cowork-with-wiki` to create or update documentation.
+- If a Jira issue contains a Figma URL, use `/cowork-with:cowork-with-figma` to read design context before implementing.
 
 ## Limitations
 

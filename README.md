@@ -1,12 +1,13 @@
 # cowork-with
 
-Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, and code into one workflow loop inside Claude Code — so the AI agent understands what to build, why, and when to close the loop.
+Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, Figma designs, and code into one workflow loop inside Claude Code — so the AI agent understands what to build, why, and when to close the loop.
 
 ## Why
 
-When developers work with AI agents, the agent only sees code. It doesn't know what the PM specified, what tasks are in the sprint, or what the product docs say. This plugin bridges that gap:
+When developers work with AI agents, the agent only sees code. It doesn't know what the PM specified, what tasks are in the sprint, what the product docs say, or what the design looks like. This plugin bridges that gap:
 
 - **PM → Dev**: Read Jira tasks and Confluence specs before writing code
+- **Design → Dev**: Read Figma designs, extract tokens, generate code from specs
 - **Dev → PM**: Auto-close tasks on commit, comment @creator
 - **Dev → QA**: Link commits to issues with structured descriptions
 - **QA → Dev**: Surface related issues and doc gaps during development
@@ -37,8 +38,9 @@ After installing the plugin, press `Ctrl+C` to exit and restart Claude Code. The
 ```
 
 This walks you through:
-1. Authenticating with Jira and Confluence via `/mcp` → `plugin:cowork-with:atlassian` → OAuth
-2. Configuring permissions (optional)
+1. Authenticating with Atlassian (Jira + Confluence) via `/mcp` → `plugin:cowork-with:atlassian` → OAuth
+2. Authenticating with Figma via `/mcp` → `plugin:cowork-with:figma` → OAuth
+3. Configuring permissions (optional)
 
 ## Usage
 
@@ -51,6 +53,10 @@ Fix the bug in...        <- commit triggers task closure check
 /cowork-with:cowork-with-wiki   <- activate Wiki workflow
 What does the product spec say about...  <- reads product docs
 Search the wiki for...           <- CQL-powered search
+
+/cowork-with:cowork-with-figma  <- activate Figma workflow
+Implement this design: <figma-url>  <- reads design context, generates code
+Extract the design tokens from...    <- colors, spacing, typography
 ```
 
 ## Skills
@@ -59,23 +65,24 @@ Search the wiki for...           <- CQL-powered search
 |-------|---------|---------|
 | Jira | `/cowork-with:cowork-with-jira` | Issue CRUD, sprints, epics, status transitions |
 | Wiki | `/cowork-with:cowork-with-wiki` | Read product docs, search Confluence, manage personal pages |
-| Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: Atlassian Rovo MCP server |
+| Figma | `/cowork-with:cowork-with-figma` | Design-to-code, design tokens, Code Connect, screenshots |
+| Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: Atlassian + Figma MCP servers |
 
 ## How It Works
 
 ```
-   PM (Jira + Confluence)          Dev (Claude Code)           Loop Back
-┌─────────────────────┐    ┌───────────────────────┐    ┌──────────────────┐
-│ Sprint tasks        │───>│ Pull task context      │    │ Transition: Done │
-│ Product specs       │───>│ Read wiki for specs    │    │ Comment @creator │
-│ Acceptance criteria │───>│ Brainstorm approach    │───>│ Update wiki      │
-│                     │    │ Code + commit          │───>│ Close task       │
-└─────────────────────┘    └───────────────────────┘    └──────────────────┘
+  Design (Figma)    PM (Jira + Confluence)    Dev (Claude Code)        Loop Back
+┌───────────────┐  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────────────┐
+│ UI specs      │─>│ Sprint tasks        │─>│ Pull task context    │  │ Transition: Done │
+│ Design tokens │─>│ Product specs       │─>│ Read design + specs  │  │ Comment @creator │
+│ Prototypes    │  │ Acceptance criteria │─>│ Brainstorm approach  │─>│ Update wiki      │
+│               │  │                     │  │ Code + commit        │─>│ Close task       │
+└───────────────┘  └─────────────────────┘  └─────────────────────┘  └──────────────────┘
 ```
 
-1. **Pull task context** — haiku subagent reads Jira tasks and wiki specs
+1. **Pull task context** — haiku subagent reads Jira tasks, wiki specs, and Figma designs
 2. **Brainstorm** — suggests `/superpowers:brainstorming` if installed
-3. **Work** — you code as usual, with full PM context available
+3. **Work** — you code as usual, with full PM + design context available
 4. **Commit** — post-commit hook checks if in-progress tasks should be closed
 5. **Close the loop** — with your approval, transitions to Done, comments @creator, flags doc gaps
 
@@ -84,11 +91,12 @@ Search the wiki for...           <- CQL-powered search
 ```
 cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
-├── .mcp.json                     # Atlassian Rovo MCP server (auto-configured)
+├── .mcp.json                     # Atlassian + Figma MCP servers (auto-configured)
 ├── skills/
 │   ├── cowork-with-onboarding/SKILL.md  # Setup guide
 │   ├── cowork-with-jira/SKILL.md        # Jira workflow
-│   └── cowork-with-wiki/SKILL.md        # Wiki workflow
+│   ├── cowork-with-wiki/SKILL.md        # Wiki workflow
+│   └── cowork-with-figma/SKILL.md       # Figma workflow
 ├── hooks/hooks.json              # Post-commit hook config
 └── scripts/post-commit-check.sh  # Git commit detection
 ```
@@ -101,9 +109,12 @@ cowork-with/
 - Epic management: create epics, link stories
 - Confluence wiki integration: read product docs, search, manage personal pages
 - Write safety: only modify self-created wiki pages
+- Figma design integration: design-to-code, design tokens, Code Connect, screenshots
+- Code-to-design: capture running UI as editable Figma design
+- Cross-skill linking: Jira issues with Figma URLs auto-read design context
 - Post-commit hook: automated task closure with @creator notification
-- Auto-configured MCP server: no manual setup required
-- Subagent strategy: haiku reads Jira/wiki, main model writes (with user confirmation)
+- Auto-configured MCP servers: no manual setup required
+- Subagent strategy: haiku reads Jira/wiki/Figma, main model writes (with user confirmation)
 - Preview before submit: always shows draft for confirmation
 
 ## Limitations
@@ -113,6 +124,8 @@ The following operations require the web UI:
 **Jira:** Sprint management, board configuration, issue links, attachments, cloning, bulk operations, saved filters
 
 **Confluence:** Page permissions, labels, attachments, templates, page history, space admin, macros
+
+**Figma:** Direct component editing, comment management, version history, team/project management. Starter plan: 6 read calls/month
 
 ## License
 

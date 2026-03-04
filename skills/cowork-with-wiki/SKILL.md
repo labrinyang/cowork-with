@@ -93,10 +93,11 @@ Always preview page content before submission. Show title, parent page, and body
 | Pages I created | `space = "ONEKEY" AND creator = currentUser()` |
 | Pages I modified | `space = "ONEKEY" AND contributor = currentUser()` |
 
-## Jira Integration
+## Cross-Skill Integration
 
 - If product documentation is missing or outdated, suggest creating a Jira issue via `/cowork-with:cowork-with-jira` with type Task and label `documentation`.
 - When reading a wiki page, use the haiku subagent to search Jira for related issues via `searchJiraIssuesUsingJql`.
+- If a wiki page references Figma designs, use `/cowork-with:cowork-with-figma` to extract design specs for implementation.
 
 ## Limitations
 

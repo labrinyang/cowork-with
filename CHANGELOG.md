@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.2.0 (2026-03-04)
+
+### Added
+- **cowork-with-figma skill**: Figma design workflow — design-to-code, design tokens, Code Connect, screenshots, code-to-design reverse
+- Official Figma MCP server integration via `.mcp.json` (HTTP transport, OAuth auth)
+- All 13 Figma MCP tools: `get_design_context`, `get_variable_defs`, `get_code_connect_map`, `get_code_connect_suggestions`, `get_screenshot`, `get_metadata`, `get_figjam`, `whoami`, `generate_figma_design`, `generate_diagram`, `add_code_connect_map`, `send_code_connect_mappings`, `create_design_system_rules`
+- `<HARD-GATE>`: preview generated code before applying from Figma designs
+- Cross-skill integration: Jira issues with Figma URLs auto-read design context; Wiki pages reference Figma specs
+
+### Changed
+- Onboarding skill: unified auth for both Atlassian and Figma MCP servers
+- Jira skill: Cross-Skill Integration now references Figma for design context
+- Wiki skill: renamed Jira Integration to Cross-Skill Integration, added Figma reference
+- Plugin description and keywords updated to include Figma/design
+
 ## 2.1.2 (2026-03-04)
 
 ### Changed

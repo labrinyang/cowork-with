@@ -1,7 +1,7 @@
 {
   "name": "cowork-with",
-  "version": "2.1.2",
-  "description": "Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, and code into one workflow loop inside Claude Code.",
+  "version": "2.2.0",
+  "description": "Connect PM, Dev, and QA context in AI-native development. Brings Jira issues, Confluence docs, Figma designs, and code into one workflow loop inside Claude Code.",
   "author": {
     "name": "labrinyang",
     "url": "https://github.com/labrinyang"
@@ -14,6 +14,8 @@
     "confluence",
     "wiki",
     "atlassian",
+    "figma",
+    "design",
     "mcp",
     "rovo",
     "agile",

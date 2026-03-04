@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.4.0 (2026-03-04)
+
+### Added
+- **`settings.json`**: Default MCP permissions — auto-allow `mcp__atlassian__*` and `mcp__figma__*`
+- **`reference.md`** for Jira skill: progressive disclosure — agile workflow, post-commit hook, and limitations extracted from SKILL.md (250→178 lines, −29%)
+- `<HARD-GATE>` on Tool Strategy: all MCP read calls MUST go through `explorer` agent, main model forbidden from calling MCP reads directly
+
+### Changed
+- Explorer agent: add `disallowedTools: Write, Edit, NotebookEdit` and `permissionMode: plan` for system-enforced read-only
+- All skills: add `argument-hint` for autocomplete (`[PROJ-123]`, `[figma-url]`, `[search term]`)
+- All skills: add `allowed-tools` to restrict permission prompts during skill execution
+- `plugin.json`: declare explicit component paths (`agents`, `skills`, `hooks`, `mcpServers`)
+
 ## 2.3.0 (2026-03-04)
 
 ### Added

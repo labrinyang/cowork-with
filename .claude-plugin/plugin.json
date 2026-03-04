@@ -23,9 +23,5 @@
     "claude-code",
     "workflow",
     "plugin"
-  ],
-  "agents": "./agents/",
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  ]
 }

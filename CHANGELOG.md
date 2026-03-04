@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.3.0 (2026-03-04)
+
+### Added
+- **`explorer` agent** (`agents/explorer.md`): Haiku-powered read-only subagent for all MCP reads — replaces ad-hoc "haiku subagent" pattern with a formal agent definition
+  - Haiku model for cheap, fast reads
+  - Tools: Read, Glob, Grep, Bash, Agent (no Write/Edit)
+  - All Atlassian + Figma MCP read tools allowlisted, all write tools explicitly forbidden
+  - MCP parameter rules baked in (exact names, types, nodeId format)
+
+### Changed
+- All skills now reference `explorer` agent instead of ad-hoc "haiku subagent"
+- Jira skill: plain text descriptions only (no Markdown), read project metadata before drafting (localized type names, required fields, active sprint), ask user for missing required fields, confirm sprint assignment
+- Jira skill: document exact MCP parameter names/types (`issueTypeName` not `issueType`, `maxResults` as number, `fields` as object, `labels` as array)
+- Jira skill: add create-as-Task fallback for custom required field failures
+- Figma skill: document nodeId colon format (`23102:138594`, not dash)
+- All skills: strengthen HARD-GATE — text-based confirmation does NOT satisfy the gate, must call `AskUserQuestion` tool
+- Tool Strategy tables simplified (removed Why column, added spawn instructions)
+
 ## 2.2.0 (2026-03-04)
 
 ### Added

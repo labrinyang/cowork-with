@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.0.0 (2026-03-04)
+
+### Breaking Changes
+- **Migrated from acli CLI to Atlassian Rovo MCP server** — acli is no longer required
+- Removed `agents/` directory (acli-operator subagent no longer needed)
+- Removed `reference/` directory (MCP tools are self-documenting)
+
+### Added
+- Atlassian Rovo MCP integration (`https://mcp.atlassian.com/v1/sse`)
+- User lookup section (`lookupJiraAccountId` for non-self assignees)
+- Limitations section documenting operations that require Jira web UI
+- All 13 Jira MCP tools: `getJiraIssue`, `searchJiraIssuesUsingJql`, `createJiraIssue`, `editJiraIssue`, `transitionJiraIssue`, `addCommentToJiraIssue`, `addWorklogToJiraIssue`, `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFieldsData`, `getTransitionsForJiraIssue`, `getJiraIssueRemoteIssueLinks`, `lookupJiraAccountId`
+
+### Changed
+- Onboarding simplified from 5 steps to 3 (add MCP server, restart, verify)
+- Tool strategy: main model calls MCP directly instead of haiku subagent
+- Post-commit hook references MCP tools instead of acli commands
+- Setup no longer requires Homebrew or acli installation
+
+### Removed
+- `agents/acli-operator.md` — subagent replaced by direct MCP calls
+- `reference/` directory (index.md, workitems.md, workitems-advanced.md, boards-sprints.md, jql.md)
+- All `acli jira ...` command examples
+- Sprint assignment via `workitem edit` (use Jira web UI)
+- `--json` / `--yes` flag rules (not applicable to MCP)
+
 ## 1.2.0 (2026-03-03)
 
 ### Changed

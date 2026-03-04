@@ -5,17 +5,17 @@ description: Use when working with Jira issues, sprints, epics, or any Jira work
 
 # Jira Workflow
 
-Agile Jira workflow for Claude Code via the Atlassian `acli` CLI.
+Agile Jira workflow for Claude Code via the Atlassian Rovo MCP server.
 
 ## Prerequisites
 
-Ensure `acli` is installed and authenticated. Quick check:
+Ensure the Atlassian Rovo MCP server is configured. Quick check:
 
 ```bash
-acli jira auth status
+claude mcp list
 ```
 
-If not set up, run `/cowork-with:cowork-with-onboarding`.
+If `atlassian` is not listed, run `/cowork-with:cowork-with-onboarding`.
 
 ## Issue Conventions
 
@@ -67,6 +67,10 @@ When creating an issue, choose the Jira type based on intent:
 
 Always assign to `@me` unless the user specifies a different assignee.
 
+### User Lookup
+
+When assigning to someone other than `@me`, use `lookupJiraAccountId` to resolve their name or email to an account ID before creating or editing the issue.
+
 ### Default Priority
 
 Always set **Medium** unless specified. Jira priorities:
@@ -112,46 +116,46 @@ To Do → In Progress → In Review → Done
 
 **Proactive transitions:** When context makes it obvious (e.g., user says "I'm working on PROJ-42" or "let's start PROJ-42"), transition to In Progress without asking.
 
-**Custom workflow handling:** If a transition fails (project uses custom workflow), use `acli-operator` to inspect the issue's available transitions and pick the closest match. Report the actual status name to the user.
+**Custom workflow handling:** If a transition fails (project uses custom workflow), use `getTransitionsForJiraIssue` to inspect the issue's available transitions and pick the closest match. Report the actual status name to the user.
 
-## Subagent Strategy
+## Tool Strategy
 
-| Task | Model | Why |
-|------|-------|-----|
-| Read from Jira (search, view, list) | `acli-operator` (haiku) | Cheap, fast, repetitive |
-| Write to Jira (create, edit, transition, comment) | `acli-operator` (haiku) | Simple CLI calls |
-| Explore codebase for issue context | Explore subagent | Efficient file search |
-| Draft issue content (title, description, criteria) | **Main model** | Requires quality writing |
+All Jira operations use MCP tools directly from the main model — no subagent needed.
+
+| Task | Approach |
+|------|----------|
+| Read from Jira (search, view) | MCP tools: `getJiraIssue`, `searchJiraIssuesUsingJql` |
+| Write to Jira (create, edit, transition) | MCP tools: `createJiraIssue`, `editJiraIssue`, `transitionJiraIssue` |
+| Comments | MCP tool: `addCommentToJiraIssue` |
+| Project metadata | MCP tools: `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFieldsData` |
+| Explore codebase for issue context | Explore subagent |
+| Draft issue content (title, description, criteria) | Main model |
 
 ### Issue Creation Flow
 
 ```
-1. acli-operator (haiku)  → Identify active sprint (search user's recent issues or JQL)
-2. acli-operator (haiku)  → Read Jira context (existing issues, project, epics)
-3. Explore subagent       → Search codebase if needed for context
-4. Main model             → Draft title, description, acceptance criteria
-5. Preview to user        → Show full draft for confirmation (include sprint info)
-6. acli-operator (haiku)  → Create issue after user approves
-7. acli-operator (haiku)  → Add to sprint if user confirms (see Sprint Assignment below)
+1. MCP: searchJiraIssuesUsingJql → Identify active sprint / existing issues
+2. MCP: getVisibleJiraProjects   → Confirm project key
+3. Explore subagent              → Search codebase if needed for context
+4. Main model                    → Draft title, description, acceptance criteria
+5. Preview to user               → Show full draft for confirmation
+6. MCP: createJiraIssue          → Create issue after user approves
 ```
-
-### Sprint Assignment
-
-`workitem create` has no `--sprint` flag. To add an issue to a sprint after creation, use `workitem edit`:
-
-```bash
-acli jira workitem edit --key "PROJ-123" --from-json sprint-move.json --yes --json
-```
-
-If `workitem edit` does not support sprint fields, sprint assignment must be done through the Jira web UI. Inform the user accordingly.
 
 ### Issue Update Flow
 
 ```
-1. acli-operator (haiku)  → Read current issue state
-2. Main model             → Determine changes, draft new content if needed
-3. Preview to user        → Show changes for confirmation (content changes only)
-4. acli-operator (haiku)  → Apply updates
+1. MCP: getJiraIssue        → Read current issue state
+2. Main model               → Determine changes, draft new content if needed
+3. Preview to user          → Show changes for confirmation (content changes only)
+4. MCP: editJiraIssue       → Apply updates
+```
+
+### Status Transitions
+
+```
+1. MCP: getTransitionsForJiraIssue → Get available transitions
+2. MCP: transitionJiraIssue        → Apply transition
 ```
 
 ### Key Rules
@@ -161,13 +165,6 @@ Always preview issue content before submission. Show title, type, description, l
 </HARD-GATE>
 
 - **Status-only transitions skip preview** — apply directly.
-- **All acli commands use `--json` flag** for structured output.
-- **Transitions use `--yes` flag** to avoid interactive prompts.
-- For complete acli command syntax, see `reference/index.md`.
-
-**Related resources:**
-- **reference/** — acli CLI command templates, split by topic (workitems, sprints, JQL)
-- **cowork-with:cowork-with-onboarding** — Setup and authentication
 
 ## Agile Workflow
 
@@ -175,13 +172,13 @@ Always preview issue content before submission. Show title, type, description, l
 
 Epics group related stories under a theme or feature area.
 
-- Create epic: `acli jira workitem create --type "Epic" --summary "..." --project "PROJ" --assignee "@me" --json`
-- Link story to epic: use `--parent "PROJ-100"` when creating, or edit after creation
+- Create epic: `createJiraIssue` with type "Epic"
+- Link story to epic: set the parent field when creating, or use `editJiraIssue` after creation
 - Epic titles are plain descriptive text (e.g., "OAuth Integration", "Payment System Overhaul")
 - If work spans 3+ related stories, create an epic first
 - Before creating, check existing epics:
   ```
-  acli jira workitem search --jql "project = PROJ AND issuetype = Epic AND status != Done" --json
+  searchJiraIssuesUsingJql with JQL: "project = PROJ AND issuetype = Epic AND status != Done"
   ```
 
 ### Sprints
@@ -189,23 +186,18 @@ Epics group related stories under a theme or feature area.
 The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's job).
 
 - **Check active sprint:** query via JQL `sprint in openSprints()`
-- **List sprints for a board:** `acli jira board list-sprints --id BOARD_ID --state active --json`
-- **View sprint items** (both flags required): `acli jira sprint list-workitems --sprint SPRINT_ID --board BOARD_ID --json`
+- **When user asks "what am I working on?"**, search:
+  ```
+  searchJiraIssuesUsingJql with JQL: "sprint in openSprints() AND assignee = currentUser()"
+  ```
 - **Never auto-add issues to a sprint** — let the user or Scrum Master decide
-- When user asks "what am I working on?", search:
-  ```
-  acli jira workitem search --jql "sprint in openSprints() AND assignee = currentUser()" --json
-  ```
+- Sprint management (creating, starting, closing sprints) requires the Jira web UI
 
 > **Anti-pattern:** Board is a Jira view-layer concept. You cannot reverse-lookup which board an issue belongs to. Do not iterate boards to locate an issue — use JQL search instead.
 
 ### Sub-tasks
 
-Break down stories into discrete pieces:
-
-```bash
-acli jira workitem create --type "Sub-task" --summary "..." --parent "PROJ-456" --project "PROJ" --assignee "@me" --json
-```
+Break down stories into discrete pieces using `createJiraIssue` with type "Sub-task" and the parent field set to the parent issue key.
 
 Sub-tasks inherit the parent's sprint and epic.
 
@@ -225,17 +217,17 @@ If not installed, proceed with normal conversation-based discussion.
 
 After a git commit, the plugin's hook injects context about checking task status. When this happens:
 
-1. Use `acli-operator` to search in-progress tasks assigned to the user:
+1. Search in-progress tasks assigned to the user:
    ```
-   acli jira workitem search --jql "status = 'In Progress' AND assignee = currentUser()" --json
+   searchJiraIssuesUsingJql with JQL: "status = 'In Progress' AND assignee = currentUser()"
    ```
 
 2. If any task appears related to the commit (match by branch name, commit message, or conversation context), ask the user:
    > "Should I close PROJ-123 (task summary)?"
 
 3. If user approves:
-   - Transition to **Done**: `acli jira workitem transition --key "PROJ-123" --status "Done" --yes --json`
-   - Add a comment summarizing the work
+   - Transition to **Done** using `transitionJiraIssue`
+   - Add a comment summarizing the work using `addCommentToJiraIssue`
    - If the issue was **NOT created by the current user**, @mention the creator in the comment
    - If the issue **was** created by the current user, skip the @mention
 
@@ -253,6 +245,19 @@ After a git commit, the plugin's hook injects context about checking task status
 
 Include the Jira issue key in the commit message when the commit is related to a task.
 
+## Limitations
+
+The following operations are **not available** via MCP and require the Jira web UI:
+
+- Sprint management (create, start, close sprints)
+- Board configuration
+- Issue links (linking two issues together)
+- Attachments (uploading files to issues)
+- Cloning issues
+- Bulk operations
+- Saved filters
+- Moving issues between projects
+
 ## Quick Reference
 
 | Action | Rule |
@@ -261,6 +266,7 @@ Include the Jira issue key in the commit message when the commit is related to a
 | Issue description | Background + Acceptance Criteria |
 | Issue type | Story / Bug / Task / Epic / Sub-task |
 | Assign issue | Default to `@me` |
+| User lookup | `lookupJiraAccountId` for non-self assignees |
 | Label | Lowercase matching issue type |
 | Priority | Default Medium |
 | New issue status | To Do (project default) |
@@ -268,10 +274,8 @@ Include the Jira issue key in the commit message when the commit is related to a
 | Code in review | Transition to In Review |
 | Commit closes issue | Transition to Done (user approval required) |
 | Close comment | @mention creator if not self-created |
-| Read/write Jira | `acli-operator` subagent (haiku) |
+| All Jira operations | MCP tools called directly (no subagent) |
 | Draft content | Main model, preview before submit |
-| All acli commands | `--json` flag |
-| Transitions | `--yes` flag |
 | Related stories | Group under an Epic |
 | Sprint queries | JQL: `sprint in openSprints()` |
 | Brainstorming | Suggest `/superpowers:brainstorming` if available |

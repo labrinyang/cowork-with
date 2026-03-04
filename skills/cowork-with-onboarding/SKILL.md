@@ -1,6 +1,6 @@
 ---
 name: cowork-with-onboarding
-description: Guides installation of Homebrew, the Atlassian acli CLI, authentication with Jira, and optional superpowers plugin setup. Use when the user needs to set up acli or mentions Jira CLI setup.
+description: Guides setup of the Atlassian Rovo MCP server for Jira integration. Use when the user needs to set up Jira access or mentions Jira MCP setup.
 disable-model-invocation: true
 allowed-tools: Bash, Read, AskUserQuestion
 ---
@@ -9,103 +9,58 @@ allowed-tools: Bash, Read, AskUserQuestion
 
 Walk the user through setting up their environment for the cowork-with plugin. Check each step and skip any that are already complete.
 
-## Step 1: Homebrew
+## Step 1: Add the Atlassian Rovo MCP Server
 
-Check if Homebrew is installed:
-
-```bash
-which brew
-```
-
-If missing, guide the user to install it:
+Check if the MCP server is already configured:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+claude mcp list
 ```
 
-Verify after install:
+If `atlassian` is not listed, add it:
 
 ```bash
-brew --version
+claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
 ```
 
-## Step 2: Atlassian CLI (acli)
+## Step 2: Restart Claude Code
 
-Check if acli is installed:
+The MCP server won't be available until Claude Code is restarted. Tell the user:
 
-```bash
-which acli
-```
+> Press **Ctrl+C** to exit Claude Code, then relaunch it.
 
-If missing, install:
+## Step 3: Verify Connection
 
-```bash
-brew tap atlassian/homebrew-acli
-brew install acli
-```
+After restart, call any Atlassian MCP tool (e.g., `getVisibleJiraProjects`). This will trigger the OAuth browser flow automatically on first use:
 
-Verify:
+1. A browser window opens
+2. The user selects their Atlassian site and grants access
+3. Authentication completes automatically
 
-```bash
-acli --version
-```
-
-## Step 3: Authenticate with Jira
-
-Check authentication status:
-
-```bash
-acli jira auth status
-```
-
-If not authenticated, run browser-based OAuth:
-
-```bash
-acli jira auth login --web
-```
-
-This opens a browser window. The user should:
-1. Select their Atlassian site
-2. Grant access to the CLI
-3. Return to the terminal
-
-Verify authentication:
-
-```bash
-acli jira auth status
-```
+If the tool call succeeds, setup is complete.
 
 ## Step 4: Claude Code Permissions (Optional)
 
-For a smoother workflow, suggest adding acli commands to the project's allow list. Show the user what to add to `.claude/settings.json` or `.claude/settings.local.json`:
+For a smoother workflow, suggest adding Atlassian MCP tools to the project's allow list. Show the user what to add to `.claude/settings.json` or `.claude/settings.local.json`:
 
 ```json
 {
   "permissions": {
     "allow": [
-      "Bash(acli *)"
+      "mcp__atlassian__*"
     ]
   }
 }
 ```
 
-This prevents repeated permission prompts for acli commands.
-
-## Step 5: Superpowers Plugin (Optional)
-
-Ask the user if they want structured brainstorming and development workflows.
-
-If yes, the superpowers plugin provides `/superpowers:brainstorming`, `/superpowers:test-driven-development`, and more.
-
-Install instructions depend on how the user manages plugins. Point them to the superpowers plugin documentation for their setup.
+This prevents repeated permission prompts for Jira MCP tool calls.
 
 ## Completion
 
 After all steps pass, confirm readiness and display available commands:
 
 **Setup Status:**
-- Homebrew: installed
-- acli: installed and authenticated
+- Atlassian Rovo MCP: configured and authenticated
 - Jira: accessible
 
 **Available Commands:**

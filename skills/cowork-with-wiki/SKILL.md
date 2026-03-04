@@ -1,6 +1,6 @@
 ---
 name: cowork-with-wiki
-description: Use when working with Confluence wiki pages, product documentation, or knowledge base content. Activate for reading product docs, searching wiki spaces, browsing page hierarchies, creating or editing personal wiki pages, and adding comments. Also activate when the user mentions wiki, Confluence, product docs, or documentation pages.
+description: Use when the user works with or mentions Confluence wiki, product docs, documentation pages, or knowledge base content
 ---
 
 # Wiki Workflow

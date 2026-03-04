@@ -1,6 +1,6 @@
 ---
 name: cowork-with-onboarding
-description: Guides setup of the Atlassian Rovo MCP server for Jira integration. Use when the user needs to set up Jira access or mentions Jira MCP setup.
+description: Guides Atlassian Rovo MCP setup for Jira and Confluence integration
 disable-model-invocation: true
 allowed-tools: Read, AskUserQuestion
 ---

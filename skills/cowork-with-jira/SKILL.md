@@ -1,6 +1,6 @@
 ---
 name: cowork-with-jira
-description: Use when working with Jira issues, sprints, epics, or any Jira workflow. Activate for issue creation, status transitions, sprint management, commit workflows, and agile project organization. Also activate when the user mentions Jira tickets, stories, bugs, tasks, or board management.
+description: Use when the user works with or mentions Jira issues, tickets, stories, bugs, tasks, sprints, epics, or any agile workflow
 ---
 
 # Jira Workflow

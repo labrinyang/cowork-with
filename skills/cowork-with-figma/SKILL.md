@@ -25,7 +25,7 @@ When a Figma URL appears — in conversation, a Jira issue description, or a wik
 ALL MCP read tool calls MUST go through the `explorer` agent. The main model MUST NOT call any MCP read tool directly — always spawn the `explorer` agent to do it. This is mandatory because the explorer agent enforces correct parameter types and names.
 </HARD-GATE>
 
-Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, read-only tools, all MCP read access).
+Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.md` — haiku model, MCP reads + git only, no code file access).
 
 | Task | Who |
 |------|-----|

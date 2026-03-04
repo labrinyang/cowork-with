@@ -9,22 +9,13 @@ Agile Jira workflow for Claude Code via the Atlassian Rovo MCP server.
 
 ## Prerequisites
 
-The Atlassian Rovo MCP server is automatically configured by the plugin. If authentication hasn't been completed yet, run `/cowork-with:cowork-with-onboarding`.
+MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onboarding`.
 
 ## Issue Conventions
 
 ### Title Format
 
-**No type prefix.** Jira has native issue types (Story, Bug, Task, Epic, Sub-task) — do not duplicate them in the title.
-
-**Good:**
-- `Add OAuth login flow` (type: Story)
-- `Fix crash on empty cart submission` (type: Bug)
-- `Upgrade React to v19` (type: Task)
-
-**Bad:**
-- `[Feature] Add OAuth login flow` — redundant, Jira already tracks type
-- `add login` — too vague
+**No type prefix.** Jira tracks issue types natively — never prefix with `[Feature]`, `Bug:`, etc.
 
 ### Description Template
 
@@ -43,17 +34,17 @@ Do not skip Acceptance Criteria. Even for small tasks, at least one criterion is
 
 ### Issue Type Selection
 
-When creating an issue, choose the Jira type based on intent:
+| Intent | Jira Type | Label | When to use |
+|--------|-----------|-------|-------------|
+| New functionality | Story | `story` | User-facing feature or capability |
+| Bug fix | Bug | `bug` | Something is broken |
+| Technical work | Task | `task` | Maintenance, config, dependencies, refactoring |
+| Research | Task | `spike` | Investigation or spike |
+| Documentation | Task | `documentation` | Docs changes |
+| Large initiative | Epic | `epic` | Groups 3+ related stories |
+| Subtask | Sub-task | `subtask` | Discrete piece of a parent story |
 
-| Intent | Jira Type | When to use |
-|--------|-----------|-------------|
-| New functionality | Story | User-facing feature or capability |
-| Bug fix | Bug | Something is broken |
-| Technical work | Task | Maintenance, config, dependencies, refactoring |
-| Research | Task | Investigation or spike (add `spike` label) |
-| Documentation | Task | Docs changes (add `documentation` label) |
-| Large initiative | Epic | Groups 3+ related stories |
-| Subtask | Sub-task | Discrete piece of a parent story |
+Additional labels for special categories: `tech-debt`. If the project has existing label conventions (check recent issues), follow those instead.
 
 ## Workflow Rules
 
@@ -67,7 +58,7 @@ When assigning to someone other than `@me`, use a haiku subagent to call `lookup
 
 ### Default Priority
 
-Always set **Medium** unless specified. Jira priorities:
+Always set **Medium** unless specified.
 
 | Priority | When to use |
 |----------|-------------|
@@ -77,25 +68,7 @@ Always set **Medium** unless specified. Jira priorities:
 | Low | Nice-to-have, minor polish |
 | Lowest | Cosmetic, trivial |
 
-### Labels
-
-Apply lowercase labels matching the issue type:
-
-| Jira Type | Label |
-|-----------|-------|
-| Story | `story` |
-| Bug | `bug` |
-| Task | `task` |
-| Epic | `epic` |
-| Sub-task | `subtask` |
-
-For special categories, add additional labels: `spike`, `documentation`, `tech-debt`.
-
-If the project has existing label conventions (check recent issues), follow those instead.
-
 ### Status Lifecycle
-
-Standard Jira workflow:
 
 ```
 To Do → In Progress → In Review → Done
@@ -108,9 +81,9 @@ To Do → In Progress → In Review → Done
 | **In Review** | Code submitted for review (if status exists) |
 | **Done** | Work finished and verified |
 
-**Proactive transitions:** When context makes it obvious (e.g., user says "I'm working on PROJ-42" or "let's start PROJ-42"), transition to In Progress without asking.
+**Proactive transitions:** When context makes it obvious (e.g., user says "I'm working on PROJ-42"), transition to In Progress without asking.
 
-**Custom workflow handling:** If a transition fails (project uses custom workflow), use a haiku subagent to call `getTransitionsForJiraIssue` to inspect the issue's available transitions and pick the closest match. Report the actual status name to the user.
+**Custom workflow handling:** If a transition fails, use a haiku subagent to call `getTransitionsForJiraIssue` to inspect available transitions and pick the closest match. Report the actual status name to the user.
 
 ## Tool Strategy
 
@@ -125,11 +98,9 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 | Preview to user and get confirmation | Main model | User interaction |
 | Write to Jira (create, edit, transition, comment) | Main model | Requires user confirmation first |
 
-### Haiku Subagent — Jira Reader
+### MCP Tools
 
-Use the Agent tool with `model: "haiku"` for all Jira read operations. The subagent has access to Atlassian MCP tools and returns structured data to the main model.
-
-**Read MCP tools** (haiku subagent):
+**Read** (haiku subagent):
 - `getJiraIssue` — read a single issue
 - `searchJiraIssuesUsingJql` — search issues with JQL
 - `getVisibleJiraProjects` — list projects
@@ -139,7 +110,7 @@ Use the Agent tool with `model: "haiku"` for all Jira read operations. The subag
 - `getJiraIssueRemoteIssueLinks` — remote links on an issue
 - `lookupJiraAccountId` — resolve user name/email to account ID
 
-**Write MCP tools** (main model, after user confirmation):
+**Write** (main model, after user confirmation):
 - `createJiraIssue` — create a new issue
 - `editJiraIssue` — update an existing issue
 - `transitionJiraIssue` — change issue status
@@ -155,40 +126,16 @@ Use the Agent tool with `model: "haiku"` for all Jira read operations. The subag
 4. Main model            → Draft title, description, acceptance criteria
 5. Main model            → Preview to user for confirmation
 6. Main model            → Create issue after user approves (createJiraIssue)
-7. Main model            → Offer to create a feature branch if user wants (git checkout -b feat/PROJ-123-slug)
+7. Main model            → Offer to create a feature branch (git checkout -b feat/PROJ-123-slug)
 ```
-
-### Issue Update Flow
-
-```
-1. Haiku subagent        → Read current issue state (getJiraIssue)
-2. Main model            → Determine changes, draft new content if needed
-3. Main model            → Preview changes to user for confirmation
-4. Main model            → Apply updates after user approves (editJiraIssue)
-```
-
-### Status Transitions
-
-```
-1. Haiku subagent        → Get available transitions (getTransitionsForJiraIssue)
-2. Main model            → Apply transition (transitionJiraIssue)
-```
-
-### Key Rules
 
 <HARD-GATE>
-Always preview issue content before submission. Show title, type, description, labels, priority before creating or making content changes. Do NOT submit to Jira without user confirmation.
+Always preview issue content before submission. Show title, type, description, labels, priority before creating or making content changes. Do NOT submit to Jira without user confirmation. Status-only transitions skip preview.
 </HARD-GATE>
-
-- **Status-only transitions skip preview** — apply directly.
-- **All Jira reads go through haiku subagent** — never read from Jira directly in the main model.
-- **All Jira writes stay in the main model** — ensures user confirmation before any mutation.
 
 ## Agile Workflow
 
 ### Epics
-
-Epics group related stories under a theme or feature area.
 
 - Create epic: `createJiraIssue` with type "Epic" (main model, after user confirms)
 - Link story to epic: set the parent field when creating, or use `editJiraIssue` after creation
@@ -209,29 +156,28 @@ The skill is sprint-aware but does NOT manage sprints (that's the Scrum Master's
   searchJiraIssuesUsingJql with JQL: "sprint in openSprints() AND assignee = currentUser()"
   ```
 - **Never auto-add issues to a sprint** — let the user or Scrum Master decide
-- Sprint management (creating, starting, closing sprints) requires the Jira web UI
 
 > **Anti-pattern:** Board is a Jira view-layer concept. You cannot reverse-lookup which board an issue belongs to. Do not iterate boards to locate an issue — use JQL search instead.
 
 ### Sub-tasks
 
-Break down stories into discrete pieces using `createJiraIssue` with type "Sub-task" and the parent field set to the parent issue key (main model, after user confirms).
+Break down stories into discrete pieces using `createJiraIssue` with type "Sub-task" and the parent field set to the parent issue key (main model, after user confirms). Sub-tasks inherit the parent's sprint and epic.
 
-Sub-tasks inherit the parent's sprint and epic.
+## Post-Commit & Git Context
 
-## Brainstorming Integration
+The current repo's git and GitHub state is available as context. Use it naturally when it helps — not as mandatory steps.
 
-After reading task context from Jira (via haiku subagent), ask the user:
+**Available context** (via `git` and `gh` CLI):
+- `git branch` / `git log --oneline` — current branch and recent commits
+- `git diff` / `git diff --stat` — what changed
+- `gh pr list` / `gh pr view` — open pull requests
 
-> "Would you like to brainstorm implementation approaches?"
+**When to use it:**
+- **Creating an issue** — glance at branch name and recent commits to enrich the issue description
+- **Closing an issue** — summarize code changes and link the PR in the closing comment
+- **Linking PRs** — if a PR title or branch contains a Jira key, mention it when discussing the issue
 
-If the user agrees and the superpowers plugin is installed, suggest:
-
-> "You can use `/superpowers:brainstorming` to start a structured brainstorming session."
-
-If not installed, proceed with normal conversation-based discussion.
-
-## Post-Commit Behavior
+### Post-Commit Hook
 
 After a git commit, the plugin's hook injects context about checking task status. When this happens:
 
@@ -246,7 +192,7 @@ After a git commit, the plugin's hook injects context about checking task status
 3. If user approves:
    - Read `git log` and `git diff` to understand what changed
    - Check `gh pr list` for any open PR related to this branch
-   - Transition to **Done** using `transitionJiraIssue` (main model)
+   - Transition to **Done** using `transitionJiraIssue`
    - Add a closing comment using `addCommentToJiraIssue` — include a summary of changes, link the PR if one exists
    - If the issue was **NOT created by the current user**, @mention the creator in the comment
    - If the issue **was** created by the current user, skip the @mention
@@ -257,40 +203,14 @@ After a git commit, the plugin's hook injects context about checking task status
 
 ```
 [PROJ-123] commit message
-
-# Examples:
-[PROJ-42] Add OAuth login flow
-[PROJ-15] Fix crash on empty cart submission
 ```
 
 Include the Jira issue key in the commit message when the commit is related to a task.
 
-## Git & GitHub Awareness
+## Cross-Skill Integration
 
-The current repo's git and GitHub state is always available as context. Use it naturally when it helps — not as mandatory steps.
-
-**Available context** (via `git` and `gh` CLI):
-- `git branch` / `git log --oneline` — current branch and recent commits
-- `git diff` / `git diff --stat` — what changed
-- `gh pr list` / `gh pr view` — open pull requests
-- `gh issue list` — GitHub issues (if the project uses both)
-
-**When to use it:**
-- **Creating an issue** — glance at the branch name and recent commits to enrich the issue description with dev context
-- **Closing an issue** — summarize the actual code changes (`git diff --stat`) and link the PR in the closing comment
-- **After creating an issue** — offer to create a feature branch (`git checkout -b feat/PROJ-123-slug`) if the user wants to start immediately
-- **Linking PRs** — if a PR title or branch contains a Jira key, mention it when discussing the issue
-- **Reviewing sprint work** — `git log` can show what was actually committed vs. what the sprint planned
-
-Do not force git commands into every interaction. Read the situation — if the user is just asking about sprint status, Jira context alone is enough. If they're closing a task after coding, git context makes the closing comment more useful.
-
-## Wiki Integration
-
-When working with Jira issues, consider these wiki connections:
-
-- **Need product context?** Use `/cowork-with:cowork-with-wiki` to look up product documentation and specifications from the Confluence knowledge base.
-- **Link wiki pages:** When an issue relates to documented product behavior, reference the relevant wiki page URL in the issue description.
-- **Doc gaps:** If implementation reveals undocumented product behavior, suggest creating or updating a wiki page via `/cowork-with:cowork-with-wiki`.
+- After reading task context, offer `/superpowers:brainstorming` to explore implementation approaches.
+- If implementation reveals undocumented product behavior, suggest `/cowork-with:cowork-with-wiki` to create or update documentation.
 
 ## Limitations
 
@@ -304,29 +224,3 @@ The following operations are **not available** via MCP and require the Jira web 
 - Bulk operations
 - Saved filters
 - Moving issues between projects
-
-## Quick Reference
-
-| Action | Rule |
-|--------|------|
-| Issue title | Plain text, no type prefix |
-| Issue description | Background + Acceptance Criteria |
-| Issue type | Story / Bug / Task / Epic / Sub-task |
-| Assign issue | Default to `@me` |
-| User lookup | Haiku subagent → `lookupJiraAccountId` |
-| Label | Lowercase matching issue type |
-| Priority | Default Medium |
-| New issue status | To Do (project default) |
-| Start working | Transition to In Progress |
-| Code in review | Transition to In Review |
-| Commit closes issue | Transition to Done (user approval required) |
-| Close comment | @mention creator if not self-created |
-| Read from Jira | Haiku subagent (cheap, fast) |
-| Read git/gh context | Main model, use when it enriches the interaction |
-| Write to Jira | Main model (user confirmation first) |
-| Draft content | Main model, preview before submit |
-| Feature branch | Offer `feat/PROJ-123-slug` after issue creation |
-| Closing comment | Include git diff summary + PR link if available |
-| Related stories | Group under an Epic |
-| Sprint queries | Haiku subagent → JQL: `sprint in openSprints()` |
-| Brainstorming | Suggest `/superpowers:brainstorming` if available |

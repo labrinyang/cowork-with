@@ -260,6 +260,14 @@ After a git commit, the plugin's hook injects context about checking task status
 
 Include the Jira issue key in the commit message when the commit is related to a task.
 
+## Wiki Integration
+
+When working with Jira issues, consider these wiki connections:
+
+- **Need product context?** Use `/cowork-with:cowork-with-wiki` to look up product documentation and specifications from the Confluence knowledge base.
+- **Link wiki pages:** When an issue relates to documented product behavior, reference the relevant wiki page URL in the issue description.
+- **Doc gaps:** If implementation reveals undocumented product behavior, suggest creating or updating a wiki page via `/cowork-with:cowork-with-wiki`.
+
 ## Limitations
 
 The following operations are **not available** via MCP and require the Jira web UI:

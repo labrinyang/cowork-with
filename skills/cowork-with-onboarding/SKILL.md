@@ -45,10 +45,12 @@ After authentication succeeds, confirm readiness and display available commands:
 **Setup Status:**
 - Atlassian Rovo MCP: configured and authenticated
 - Jira: accessible
+- Confluence: accessible
 
 **Available Commands:**
 
 | Command | Description |
 |---------|-------------|
 | `/cowork-with:cowork-with-jira` | Jira workflow — issue creation, status transitions, sprint queries, epic management |
+| `/cowork-with:cowork-with-wiki` | Wiki workflow — read product docs, search Confluence, manage personal pages |
 | `/cowork-with:cowork-with-onboarding` | Re-run this setup guide |

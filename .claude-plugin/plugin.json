@@ -1,7 +1,7 @@
 {
   "name": "cowork-with",
-  "version": "2.0.0",
-  "description": "Agile workflow plugin for Claude Code. Integrates Jira issue tracking, sprint management, and automated task lifecycle via the Atlassian Rovo MCP server.",
+  "version": "2.1.0",
+  "description": "Agile workflow plugin for Claude Code. Integrates Jira issue tracking, Confluence wiki, sprint management, and automated task lifecycle via the Atlassian Rovo MCP server.",
   "author": {
     "name": "labrinyang",
     "url": "https://github.com/labrinyang"
@@ -11,6 +11,8 @@
   "license": "MIT",
   "keywords": [
     "jira",
+    "confluence",
+    "wiki",
     "atlassian",
     "mcp",
     "rovo",

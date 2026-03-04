@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0 (2026-03-04)
+
+### Added
+- **cowork-with-wiki skill**: Confluence wiki workflow — read product docs, search wiki, browse page hierarchies, create/update personal pages, add comments
+- All 11 Confluence MCP tools: `getConfluencePage`, `getConfluencePageDescendants`, `getConfluencePageFooterComments`, `getConfluencePageInlineComments`, `getConfluenceSpaces`, `getPagesInConfluenceSpace`, `searchConfluenceUsingCql`, `createConfluencePage`, `updateConfluencePage`, `createConfluenceFooterComment`, `createConfluenceInlineComment`
+- Write safety `<HARD-GATE>`: refuse writes to pages not created by the current user
+- Product docs root configuration (space: ONEKEY, page ID: 489095189)
+- CQL quick reference for Confluence search
+- Cross-skill integration: Jira skill references wiki for product context; Wiki skill references Jira for doc gap issues
+
+### Changed
+- Jira skill: added Wiki Integration section for cross-referencing product docs
+- Onboarding skill: added Confluence to setup status and wiki command to available commands
+- Plugin description and keywords updated to include Confluence/wiki
+
 ## 2.0.0 (2026-03-04)
 
 ### Breaking Changes

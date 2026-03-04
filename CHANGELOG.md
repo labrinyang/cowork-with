@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.1 (2026-03-04)
+
+### Changed
+- Shorten all skill descriptions following superpowers pattern — single sentence, trigger-focused, ~60% less context budget usage
+
 ## 2.1.0 (2026-03-04)
 
 ### Added

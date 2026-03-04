@@ -73,21 +73,36 @@ Extract the design tokens from...    <- colors, spacing, typography
 
 ## How It Works
 
+Everyone uses Claude Code. Everyone stays in their lane. The plugin connects the context.
+
 ```
-  Design (Figma)    PM (Jira + Confluence)    Dev (Claude Code)        Loop Back
-┌───────────────┐  ┌─────────────────────┐  ┌─────────────────────┐  ┌──────────────────┐
-│ UI specs      │─>│ Sprint tasks        │─>│ Pull task context    │  │ Transition: Done │
-│ Design tokens │─>│ Product specs       │─>│ Read design + specs  │  │ Comment @creator │
-│ Prototypes    │  │ Acceptance criteria │─>│ Brainstorm approach  │─>│ Update wiki      │
-│               │  │                     │  │ Code + commit        │─>│ Close task       │
-└───────────────┘  └─────────────────────┘  └─────────────────────┘  └──────────────────┘
+        PM                          Dev                         QA
+   Claude Code                 Claude Code                 Claude Code
+┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
+│ Figma designs    │      │ Jira tasks       │      │ Wiki specs       │
+│ Wiki specs       │      │ Wiki specs       │      │ Figma designs    │
+│ Jira issues      │      │ Figma designs    │      │ Code + git       │
+│                  │      │ Code + git       │      │ Jira issues      │
+│ Focus:           │      │ Focus:           │      │ Focus:           │
+│ Product design,  │      │ Engineering,     │      │ Full-context     │
+│ docs, logic      │      │ implementation   │      │ quality review   │
+└────────┬─────────┘      └────────┬─────────┘      └────────┬─────────┘
+         │                         │                          │
+         └─────────────────────────┴──────────────────────────┘
+                    Shared: Jira + Confluence + Figma
 ```
 
-1. **Pull task context** — `explorer` agent (haiku) reads Jira tasks, wiki specs, and Figma designs
-2. **Brainstorm** — suggests `/superpowers:brainstorming` if installed
-3. **Work** — you code as usual, with full PM + design context available
-4. **Commit** — post-commit hook checks if in-progress tasks should be closed
-5. **Close the loop** — with your approval, transitions to Done, comments @creator, flags doc gaps
+### PM workflow
+
+PM focuses on product — designs in Figma, specs in Confluence. When reviewing implementation, PM uses Claude Code to brainstorm, analyze the code, and inspect the running result. Then creates rich, context-aware Jira issues with background, acceptance criteria, and Figma links — all without writing code.
+
+### Dev workflow
+
+Dev pulls a task and Claude Code already has the full picture: Jira description, Confluence specs, Figma design context. No context-switching between browser tabs. Code, commit, and the post-commit hook offers to close the task and @mention the PM.
+
+### QA workflow
+
+QA gets the deepest context — wiki specs for expected behavior, Figma designs for visual correctness, source code for implementation details, and Jira issues for acceptance criteria. All in one Claude Code session. Files precise, well-documented bugs with full traceability.
 
 ## Plugin Structure
 

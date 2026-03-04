@@ -48,7 +48,7 @@ Split Figma operations between a **haiku subagent** (reads) and the **main model
 - `create_design_system_rules` — generate rule file for consistent code output
 
 <HARD-GATE>
-Always preview generated code before applying. Show the design context source (Figma URL, frame name) and the generated code before writing to any file. Do NOT write code from Figma designs without user confirmation.
+Before applying generated code, use `AskUserQuestion` to present a structured confirmation. Show the design context source (Figma URL, frame name) and the generated code in the `markdown` preview field. Options: "Apply" (Recommended), "Edit", "Cancel". Do NOT write code from Figma designs without explicit user approval via this confirmation.
 </HARD-GATE>
 
 ## Cross-Skill Integration

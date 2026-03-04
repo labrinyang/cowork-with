@@ -130,7 +130,7 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 ```
 
 <HARD-GATE>
-Always preview issue content before submission. Show title, type, description, labels, priority before creating or making content changes. Do NOT submit to Jira without user confirmation. Status-only transitions skip preview.
+Before creating or updating issue content, use `AskUserQuestion` to present a structured confirmation. Show the full draft (title, type, description, labels, priority) in the `markdown` preview field. Options: "Submit" (Recommended), "Edit", "Cancel". Do NOT call any Jira write tool without explicit user approval via this confirmation. Status-only transitions skip this gate.
 </HARD-GATE>
 
 ## Agile Workflow

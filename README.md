@@ -28,9 +28,8 @@ After installing the plugin, press `Ctrl+C` to exit and restart Claude Code. The
 ```
 
 This walks you through:
-1. Verifying the MCP server (auto-configured by the plugin)
-2. Authenticating with Jira (OAuth browser flow)
-3. Configuring permissions (optional)
+1. Authenticating with Jira via `/mcp` → `plugin:cowork-with:atlassian` → OAuth
+2. Configuring permissions (optional)
 
 ## Usage
 

@@ -2,34 +2,27 @@
 name: cowork-with-onboarding
 description: Guides setup of the Atlassian Rovo MCP server for Jira integration. Use when the user needs to set up Jira access or mentions Jira MCP setup.
 disable-model-invocation: true
-allowed-tools: Bash, Read, AskUserQuestion
+allowed-tools: Read, AskUserQuestion
 ---
 
 # Onboarding
 
-Walk the user through setting up their environment for the cowork-with plugin. Check each step and skip any that are already complete.
+Walk the user through setting up their environment for the cowork-with plugin.
 
-## Step 1: Verify MCP Server
+## Step 1: Authenticate with Jira
 
-The Atlassian Rovo MCP server is automatically configured by the plugin. Verify it's loaded:
+The Atlassian Rovo MCP server is automatically configured by the plugin. The user just needs to authenticate.
 
-```bash
-claude mcp list
-```
+Tell the user to:
 
-If `atlassian` appears in the list, the server is ready. If not, the plugin may not have loaded correctly — ask the user to restart Claude Code and re-run this onboarding.
+1. Type `/mcp` and press Enter
+2. Select **`plugin:cowork-with:atlassian`** from the list
+3. In the browser page that opens, under **"Use app on"**, select their Atlassian site
+4. Click **"Accept"** to grant access
 
-## Step 2: Authenticate with Jira
+Authentication is complete when the user returns to Claude Code with a success message.
 
-Call any Atlassian MCP tool (e.g., `getVisibleJiraProjects`) to trigger the OAuth browser flow:
-
-1. A browser window opens automatically
-2. The user selects their Atlassian site and grants access
-3. Authentication completes — the tool call returns Jira data
-
-If the tool call succeeds, authentication is complete.
-
-## Step 3: Claude Code Permissions (Optional)
+## Step 2: Claude Code Permissions (Optional)
 
 For a smoother workflow, suggest adding Atlassian MCP tools to the project's allow list. Show the user what to add to `.claude/settings.json` or `.claude/settings.local.json`:
 
@@ -47,7 +40,7 @@ This prevents repeated permission prompts for Jira MCP tool calls.
 
 ## Completion
 
-After all steps pass, confirm readiness and display available commands:
+After authentication succeeds, confirm readiness and display available commands:
 
 **Setup Status:**
 - Atlassian Rovo MCP: configured and authenticated

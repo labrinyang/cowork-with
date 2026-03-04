@@ -119,6 +119,7 @@ Split Jira operations between a **haiku subagent** (reads) and the **main model*
 | Task | Who | Why |
 |------|-----|-----|
 | Read from Jira (search, view, metadata) | Haiku subagent | Cheap, fast, keeps main context clean |
+| Read git/gh context (branch, log, diff, PRs) | Main model | Local CLI, fast, informs drafting |
 | Explore codebase for issue context | Explore subagent | Efficient file search |
 | Draft issue content (title, description, criteria) | Main model | Requires quality writing |
 | Preview to user and get confirmation | Main model | User interaction |
@@ -149,10 +150,12 @@ Use the Agent tool with `model: "haiku"` for all Jira read operations. The subag
 
 ```
 1. Haiku subagent        → Read Jira context (search existing issues, confirm project, check sprint)
-2. Explore subagent      → Search codebase if needed for context
-3. Main model            → Draft title, description, acceptance criteria
-4. Main model            → Preview to user for confirmation
-5. Main model            → Create issue after user approves (createJiraIssue)
+2. Main model            → Read git context if relevant (branch, recent commits, diff)
+3. Explore subagent      → Search codebase if needed for context
+4. Main model            → Draft title, description, acceptance criteria
+5. Main model            → Preview to user for confirmation
+6. Main model            → Create issue after user approves (createJiraIssue)
+7. Main model            → Offer to create a feature branch if user wants (git checkout -b feat/PROJ-123-slug)
 ```
 
 ### Issue Update Flow
@@ -241,8 +244,10 @@ After a git commit, the plugin's hook injects context about checking task status
    > "Should I close PROJ-123 (task summary)?"
 
 3. If user approves:
+   - Read `git log` and `git diff` to understand what changed
+   - Check `gh pr list` for any open PR related to this branch
    - Transition to **Done** using `transitionJiraIssue` (main model)
-   - Add a comment summarizing the work using `addCommentToJiraIssue` (main model)
+   - Add a closing comment using `addCommentToJiraIssue` — include a summary of changes, link the PR if one exists
    - If the issue was **NOT created by the current user**, @mention the creator in the comment
    - If the issue **was** created by the current user, skip the @mention
 
@@ -259,6 +264,25 @@ After a git commit, the plugin's hook injects context about checking task status
 ```
 
 Include the Jira issue key in the commit message when the commit is related to a task.
+
+## Git & GitHub Awareness
+
+The current repo's git and GitHub state is always available as context. Use it naturally when it helps — not as mandatory steps.
+
+**Available context** (via `git` and `gh` CLI):
+- `git branch` / `git log --oneline` — current branch and recent commits
+- `git diff` / `git diff --stat` — what changed
+- `gh pr list` / `gh pr view` — open pull requests
+- `gh issue list` — GitHub issues (if the project uses both)
+
+**When to use it:**
+- **Creating an issue** — glance at the branch name and recent commits to enrich the issue description with dev context
+- **Closing an issue** — summarize the actual code changes (`git diff --stat`) and link the PR in the closing comment
+- **After creating an issue** — offer to create a feature branch (`git checkout -b feat/PROJ-123-slug`) if the user wants to start immediately
+- **Linking PRs** — if a PR title or branch contains a Jira key, mention it when discussing the issue
+- **Reviewing sprint work** — `git log` can show what was actually committed vs. what the sprint planned
+
+Do not force git commands into every interaction. Read the situation — if the user is just asking about sprint status, Jira context alone is enough. If they're closing a task after coding, git context makes the closing comment more useful.
 
 ## Wiki Integration
 
@@ -298,8 +322,11 @@ The following operations are **not available** via MCP and require the Jira web 
 | Commit closes issue | Transition to Done (user approval required) |
 | Close comment | @mention creator if not self-created |
 | Read from Jira | Haiku subagent (cheap, fast) |
+| Read git/gh context | Main model, use when it enriches the interaction |
 | Write to Jira | Main model (user confirmation first) |
 | Draft content | Main model, preview before submit |
+| Feature branch | Offer `feat/PROJ-123-slug` after issue creation |
+| Closing comment | Include git diff summary + PR link if available |
 | Related stories | Group under an Epic |
 | Sprint queries | Haiku subagent → JQL: `sprint in openSprints()` |
 | Brainstorming | Suggest `/superpowers:brainstorming` if available |

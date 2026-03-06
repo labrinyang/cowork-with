@@ -1,5 +1,27 @@
 # Changelog
 
+## 3.0.0 (2026-03-06)
+
+### Breaking Changes
+- **Removed bundled MCP servers** — `.mcp.json` and `settings.json` deleted from the plugin. Users must install Atlassian and Figma MCP servers globally via `claude mcp add -s user`. This is a one-time setup that works across all projects.
+
+### Added
+- **Branch creation hook** (`post-branch-check.sh`): detects `git checkout -b` / `git switch -c` without a Jira issue key, searches in-progress tasks, and suggests renaming the branch to include the issue key
+- **JQL quick reference** in `reference.md`: 7 categories (assignment, sprint, epic/hierarchy, label/type, date/recency, priority/status, combined patterns) with tips on date functions and text search
+- **Smart onboarding**: Step 0 auto-detects existing MCP config and authentication, skips redundant setup steps
+- Missing Atlassian read tools added to explorer and skills: `atlassianUserInfo`, `getAccessibleAtlassianResources`, `search`, `jiraRead`, `fetch`, `getConfluenceCommentChildren`
+- Cross-service `search` tool added to wiki skill for searching Confluence + Jira together
+
+### Fixed
+- **Tool name mismatch**: `getJiraIssueTypeMetaWithFieldsData` → `getJiraIssueTypeMetaWithFields` (matched actual MCP server tool name)
+
+### Changed
+- Onboarding rewritten for global MCP install flow (`claude mcp add` commands, troubleshooting section)
+- All skill prerequisites updated: "MCP is auto-configured" → "Requires globally installed MCP server"
+- Explorer agent: clarified global MCP tool naming pattern (`mcp__atlassian__*`, `mcp__figma__*`)
+- Issue creation flow: sprint fetch is now mandatory before drafting, shows sprint name/goal/dates in confirmation preview
+- README restructured: 3-step install (plugin → global MCP → onboarding), updated features list
+
 ## 2.5.0 (2026-03-04)
 
 ### Changed

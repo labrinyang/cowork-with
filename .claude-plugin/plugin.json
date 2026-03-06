@@ -1,6 +1,6 @@
 {
   "name": "cowork-with",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "description": "Connect PM, Dev, and QA context in AI-native development. Shared Jira, Confluence, and Figma context across Claude Code sessions — for teams and solo developers working in multiple terminals.",
   "author": {
     "name": "labrinyang",

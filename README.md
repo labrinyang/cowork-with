@@ -136,9 +136,9 @@ MCP servers (Atlassian + Figma) are installed globally at the user level, not bu
 
 - Issue conventions: Background + Acceptance Criteria template
 - Auto-assigns to current user, default Medium priority
-- Sprint-aware: query active sprint items via JQL
+- Sprint-aware: fetch active sprint before issue creation, JQL cheat sheet for common queries
 - Epic management: create epics, link stories
-- Confluence wiki integration: read product docs, search, manage personal pages
+- Confluence wiki integration: read product docs, search (CQL + cross-service), manage personal pages
 - Write safety: only modify self-created wiki pages
 - Figma design integration: design-to-code, design tokens, Code Connect, screenshots
 - Code-to-design: capture running UI as editable Figma design
@@ -146,6 +146,7 @@ MCP servers (Atlassian + Figma) are installed globally at the user level, not bu
 - Post-commit hook: automated task closure with @creator notification
 - Explorer agent: haiku-powered read-only subagent for all MCP reads (Jira/wiki/Figma/codebase)
 - Preview before submit: always shows draft for confirmation
+- Smart onboarding: auto-detects existing MCP setup, skips redundant steps
 
 ## Limitations
 

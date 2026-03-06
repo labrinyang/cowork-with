@@ -11,7 +11,7 @@ Confluence wiki workflow for Claude Code via the Atlassian Rovo MCP server.
 
 ## Prerequisites
 
-MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onboarding`.
+Requires globally installed **Atlassian MCP** server (named `atlassian`). If not set up, run `/cowork-with:cowork-with-onboarding`.
 
 ## Product Documentation Root
 

@@ -11,7 +11,7 @@ Design-to-code workflow for Claude Code via the official Figma MCP server.
 
 ## Prerequisites
 
-MCP is auto-configured. If not authenticated, run `/cowork-with:cowork-with-onboarding`.
+Requires globally installed **Figma MCP** server (named `figma`). If not set up, run `/cowork-with:cowork-with-onboarding`.
 
 ## Design Context from URLs
 

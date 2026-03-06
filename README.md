@@ -8,41 +8,50 @@ Works for **teams** and **solo developers**. A single developer running multiple
 
 When developers work with AI agents, the agent only sees code. It doesn't know what the PM specified, what tasks are in the sprint, what the product docs say, or what the design looks like. This plugin bridges that gap:
 
-- **PM → Dev**: Read Jira tasks and Confluence specs before writing code
-- **Design → Dev**: Read Figma designs, extract tokens, generate code from specs
-- **Dev → PM**: Auto-close tasks on commit, comment @creator
-- **Dev → QA**: Link commits to issues with structured descriptions
-- **QA → Dev**: Surface related issues and doc gaps during development
-- **Terminal → Terminal**: Shared context across multiple Claude Code sessions — one creates the issue, another implements it, both see the same task state
+- **PM -> Dev**: Read Jira tasks and Confluence specs before writing code
+- **Design -> Dev**: Read Figma designs, extract tokens, generate code from specs
+- **Dev -> PM**: Auto-close tasks on commit, comment @creator
+- **Dev -> QA**: Link commits to issues with structured descriptions
+- **QA -> Dev**: Surface related issues and doc gaps during development
+- **Terminal -> Terminal**: Shared context across multiple Claude Code sessions — one creates the issue, another implements it, both see the same task state
 
 ## Install
 
-All plugin commands are **slash commands inside Claude Code**, not terminal commands.
+### Step 1: Install the plugin
 
-### From marketplace
+From marketplace:
 
 ```
 /plugin marketplace add labrinyang/cowork-with-marketplace
 /plugin install cowork-with@cowork-with-marketplace
 ```
 
-### Local development
+Local development:
 
 ```bash
 claude --plugin-dir /path/to/cowork-with
 ```
 
-## Setup
+### Step 2: Install MCP servers globally
 
-After installing the plugin, press `Ctrl+C` to exit and restart Claude Code. Then run:
+This plugin requires two MCP servers installed at the user level. Run these in your terminal (outside Claude Code):
+
+```bash
+claude mcp add atlassian --transport sse --url https://mcp.atlassian.com/v1/sse -s user
+claude mcp add figma --transport http --url https://mcp.figma.com/mcp -s user
+```
+
+### Step 3: Authenticate and configure
+
+Restart Claude Code after installing, then run:
 
 ```
 /cowork-with:cowork-with-onboarding
 ```
 
 This walks you through:
-1. Authenticating with Atlassian (Jira + Confluence) via `/mcp` → `plugin:cowork-with:atlassian` → OAuth
-2. Authenticating with Figma via `/mcp` → `plugin:cowork-with:figma` → OAuth
+1. Authenticating with Atlassian (Jira + Confluence) via `/mcp` -> `atlassian` -> OAuth
+2. Authenticating with Figma via `/mcp` -> `figma` -> OAuth
 3. Configuring permissions (optional)
 
 ## Usage
@@ -69,7 +78,7 @@ Extract the design tokens from...    <- colors, spacing, typography
 | Jira | `/cowork-with:cowork-with-jira` | Issue CRUD, sprints, epics, status transitions |
 | Wiki | `/cowork-with:cowork-with-wiki` | Read product docs, search Confluence, manage personal pages |
 | Figma | `/cowork-with:cowork-with-figma` | Design-to-code, design tokens, Code Connect, screenshots |
-| Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: Atlassian + Figma MCP servers |
+| Onboarding | `/cowork-with:cowork-with-onboarding` | Setup: global MCP servers + authentication |
 
 ## How It Works
 
@@ -78,17 +87,18 @@ Everyone uses Claude Code. Everyone stays in their lane. The plugin connects the
 ```
         PM                          Dev                         QA
    Claude Code                 Claude Code                 Claude Code
-┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
-│ Figma designs    │      │ Jira tasks       │      │ Wiki specs       │
-│ Wiki specs       │      │ Wiki specs       │      │ Figma designs    │
-│ Jira issues      │      │ Figma designs    │      │ Code + git       │
-│                  │      │ Code + git       │      │ Jira issues      │
-│ Focus:           │      │ Focus:           │      │ Focus:           │
-│ Product design,  │      │ Engineering,     │      │ Full-context     │
-│ docs, logic      │      │ implementation   │      │ quality review   │
-└────────┬─────────┘      └────────┬─────────┘      └────────┬─────────┘
-         │                         │                          │
-         └─────────────────────────┴──────────────────────────┘
++------------------+      +------------------+      +------------------+
+| Figma designs    |      | Jira tasks       |      | Wiki specs       |
+| Wiki specs       |      | Wiki specs       |      | Figma designs    |
+| Jira issues      |      | Figma designs    |      | Code + git       |
+|                  |      | Code + git       |      | Jira issues      |
+|                  |      |                  |      |                  |
+| Focus:           |      | Focus:           |      | Focus:           |
+| Product design,  |      | Engineering,     |      | Full-context     |
+| docs, logic      |      | implementation   |      | quality review   |
++--------+---------+      +--------+---------+      +--------+---------+
+         |                         |                          |
+         +-------------------------+--------------------------+
                     Shared: Jira + Confluence + Figma
 ```
 
@@ -109,17 +119,18 @@ QA gets the deepest context — wiki specs for expected behavior, Figma designs 
 ```
 cowork-with/
 ├── .claude-plugin/plugin.json    # Plugin manifest
-├── .mcp.json                     # Atlassian + Figma MCP servers (auto-configured)
 ├── agents/
 │   └── explorer.md               # Haiku read-only subagent for all MCP reads
 ├── skills/
-│   ├── cowork-with-onboarding/SKILL.md  # Setup guide
+│   ├── cowork-with-onboarding/SKILL.md  # Setup guide (global MCP install)
 │   ├── cowork-with-jira/SKILL.md        # Jira workflow
 │   ├── cowork-with-wiki/SKILL.md        # Wiki workflow
 │   └── cowork-with-figma/SKILL.md       # Figma workflow
 ├── hooks/hooks.json              # Post-commit hook config
 └── scripts/post-commit-check.sh  # Git commit detection
 ```
+
+MCP servers (Atlassian + Figma) are installed globally at the user level, not bundled with the plugin. This means one-time setup that works across all projects.
 
 ## Features
 
@@ -133,7 +144,6 @@ cowork-with/
 - Code-to-design: capture running UI as editable Figma design
 - Cross-skill linking: Jira issues with Figma URLs auto-read design context
 - Post-commit hook: automated task closure with @creator notification
-- Auto-configured MCP servers: no manual setup required
 - Explorer agent: haiku-powered read-only subagent for all MCP reads (Jira/wiki/Figma/codebase)
 - Preview before submit: always shows draft for confirmation
 

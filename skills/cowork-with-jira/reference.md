@@ -68,6 +68,19 @@ After a git commit, the plugin's hook injects context about checking task status
 
 4. If user declines, leave the task as-is.
 
+### Branch Creation Hook
+
+When a new branch is created without a Jira issue key (via `git checkout -b` or `git switch -c`), the plugin's hook automatically:
+
+1. Detects the missing issue key in the branch name
+2. Searches in-progress Jira tasks assigned to the user
+3. Suggests renaming the branch to include the related issue key:
+   ```
+   git branch -m old-name feat/PROJ-123-slug
+   ```
+
+If the branch already contains an issue key (e.g., `feat/PROJ-123-my-feature`), the hook stays silent.
+
 ### Branch Naming
 
 ```

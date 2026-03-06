@@ -144,6 +144,7 @@ MCP servers (Atlassian + Figma) are installed globally at the user level, not bu
 - Code-to-design: capture running UI as editable Figma design
 - Cross-skill linking: Jira issues with Figma URLs auto-read design context
 - Post-commit hook: automated task closure with @creator notification
+- Branch creation hook: detects missing Jira issue key, suggests rename with related task
 - Explorer agent: haiku-powered read-only subagent for all MCP reads (Jira/wiki/Figma/codebase)
 - Preview before submit: always shows draft for confirmation
 - Smart onboarding: auto-detects existing MCP setup, skips redundant steps

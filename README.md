@@ -37,8 +37,8 @@ claude --plugin-dir /path/to/cowork-with
 This plugin requires two MCP servers installed at the user level. Run these in your terminal (outside Claude Code):
 
 ```bash
-claude mcp add atlassian --transport sse --url https://mcp.atlassian.com/v1/sse -s user
-claude mcp add figma --transport http --url https://mcp.figma.com/mcp -s user
+claude mcp add --transport sse -s user atlassian https://mcp.atlassian.com/v1/sse
+claude mcp add --transport http -s user figma https://mcp.figma.com/mcp
 ```
 
 ### Step 3: Authenticate and configure

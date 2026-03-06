@@ -26,13 +26,13 @@ The user needs to add MCP servers to their global Claude Code configuration. Run
 ### Atlassian (Jira + Confluence)
 
 ```bash
-claude mcp add atlassian --transport sse --url https://mcp.atlassian.com/v1/sse -s user
+claude mcp add --transport sse -s user atlassian https://mcp.atlassian.com/v1/sse
 ```
 
 ### Figma
 
 ```bash
-claude mcp add figma --transport http --url https://mcp.figma.com/mcp -s user
+claude mcp add --transport http -s user figma https://mcp.figma.com/mcp
 ```
 
 The `-s user` flag installs at the user level so the MCP servers are available across all projects.

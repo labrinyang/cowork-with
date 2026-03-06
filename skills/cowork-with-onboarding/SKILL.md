@@ -11,6 +11,14 @@ Walk the user through setting up their environment for the cowork-with plugin.
 
 This plugin requires two globally installed MCP servers: **Atlassian** (for Jira + Confluence) and **Figma**. The plugin itself does not bundle MCP servers — users install them once at the global level and all projects benefit.
 
+## Step 0: Detect Existing Setup
+
+Before guiding installation, check if MCP servers are already configured:
+
+1. Run `cat ~/.claude/.mcp.json 2>/dev/null` to check for existing config
+2. If `atlassian` and/or `figma` entries exist, skip to **Step 2** for the already-configured server(s)
+3. If both exist, try calling `atlassianUserInfo` and `whoami` (Figma) to verify authentication — if both succeed, skip to **Completion**
+
 ## Step 1: Install MCP Servers
 
 The user needs to add MCP servers to their global Claude Code configuration. Run these commands in their terminal (outside Claude Code):

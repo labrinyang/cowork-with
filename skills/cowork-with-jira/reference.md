@@ -85,6 +85,82 @@ Include the issue key in the branch name. Jira auto-tracks branches, commits, an
 
 Include the Jira issue key in the commit message when the commit is related to a task.
 
+## JQL Quick Reference
+
+Common JQL patterns for `searchJiraIssuesUsingJql`. Combine with `AND` / `OR`.
+
+### By Assignment
+
+| Goal | JQL |
+|------|-----|
+| My open tasks | `assignee = currentUser() AND status != Done` |
+| Unassigned in project | `project = PROJ AND assignee is EMPTY` |
+| Created by me | `reporter = currentUser()` |
+| Assigned to someone | `assignee = "user@example.com"` |
+
+### By Sprint
+
+| Goal | JQL |
+|------|-----|
+| Active sprint items | `sprint in openSprints()` |
+| My sprint work | `sprint in openSprints() AND assignee = currentUser()` |
+| Future sprint items | `sprint in futureSprints()` |
+| Sprint backlog (unfinished) | `sprint in openSprints() AND status != Done` |
+
+### By Epic & Hierarchy
+
+| Goal | JQL |
+|------|-----|
+| Stories in an epic | `"Epic Link" = PROJ-100` |
+| All epics in project | `project = PROJ AND issuetype = Epic` |
+| Open epics | `project = PROJ AND issuetype = Epic AND status != Done` |
+| Sub-tasks of an issue | `parent = PROJ-123` |
+
+### By Label & Type
+
+| Goal | JQL |
+|------|-----|
+| By label | `project = PROJ AND labels = "tech-debt"` |
+| Multiple labels | `labels in ("tech-debt", "security")` |
+| Bugs only | `project = PROJ AND issuetype = Bug` |
+| Stories + bugs | `project = PROJ AND issuetype in (Story, Bug)` |
+
+### By Date & Recency
+
+| Goal | JQL |
+|------|-----|
+| Created this week | `project = PROJ AND created >= startOfWeek()` |
+| Updated in last 7 days | `project = PROJ AND updated >= -7d` |
+| Created this month | `project = PROJ AND created >= startOfMonth()` |
+| Resolved recently | `project = PROJ AND resolved >= -7d` |
+| Overdue | `project = PROJ AND duedate < now() AND status != Done` |
+
+### By Priority & Status
+
+| Goal | JQL |
+|------|-----|
+| High priority open | `project = PROJ AND priority in (Highest, High) AND status != Done` |
+| In Progress tasks | `project = PROJ AND status = "In Progress"` |
+| Blocked / on hold | `project = PROJ AND status = "On Hold"` |
+| Recently resolved | `project = PROJ AND status = Done AND resolved >= -7d` |
+
+### Combined Patterns
+
+| Goal | JQL |
+|------|-----|
+| My bugs this sprint | `sprint in openSprints() AND assignee = currentUser() AND issuetype = Bug` |
+| Unfinished high-priority | `project = PROJ AND priority in (Highest, High) AND status not in (Done, Closed)` |
+| Tech debt backlog | `project = PROJ AND labels = "tech-debt" AND status = "To Do"` |
+| Sprint review (done items) | `sprint in openSprints() AND status = Done` |
+
+### Tips
+
+- Use `currentUser()` instead of hardcoding usernames — works across all accounts
+- Date functions: `startOfDay()`, `startOfWeek()`, `startOfMonth()`, `now()`, `-7d` (relative)
+- `text ~ "keyword"` searches summary + description
+- `summary ~ "keyword"` searches summary only
+- `ORDER BY priority DESC, created ASC` for sorting
+
 ## Limitations
 
 The following operations are **not available** via MCP and require the Jira web UI:

@@ -114,10 +114,13 @@ Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.
 - `searchJiraIssuesUsingJql` — search issues with JQL (param: `maxResults` must be **number**, not string)
 - `getVisibleJiraProjects` — list projects
 - `getJiraProjectIssueTypesMetadata` — issue types for a project (param: `projectIdOrKey`)
-- `getJiraIssueTypeMetaWithFieldsData` — field metadata for an issue type (param: `projectIdOrKey`, `issueTypeId`)
+- `getJiraIssueTypeMetaWithFields` — field metadata for an issue type (param: `projectIdOrKey`, `issueTypeId`)
 - `getTransitionsForJiraIssue` — available status transitions
 - `getJiraIssueRemoteIssueLinks` — remote links on an issue
 - `lookupJiraAccountId` — resolve user name/email to account ID
+- `atlassianUserInfo` — current authenticated user info
+- `jiraRead` — generic Jira REST API read (fallback for endpoints not covered above)
+- `search` — cross-service Atlassian search (searches Jira + Confluence together)
 
 **Write** (main model, after user confirmation):
 - `createJiraIssue` — create a new issue (param: `issueTypeName` — NOT `issueType`; `labels` is array of strings)
@@ -129,19 +132,24 @@ Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.
 ### Issue Creation Flow
 
 ```
-1. `explorer` agent        → Read project metadata:
+1. `explorer` agent        → Fetch project context (ALL in one batch, parallel where possible):
                            a. getJiraProjectIssueTypesMetadata (exact localized type names)
-                           b. getJiraIssueTypeMetaWithFieldsData (ALL required fields incl. custom)
-                           c. searchJiraIssuesUsingJql "sprint in openSprints()" (active sprint)
+                           b. getJiraIssueTypeMetaWithFields (ALL required fields incl. custom)
+                           c. searchJiraIssuesUsingJql "sprint in openSprints()" (active sprint name + goal)
 2. Main model            → Compare required fields vs. known values
                            If ANY required field is missing → ask user via AskUserQuestion BEFORE drafting
-3. Main model            → Ask user which sprint to assign (show active sprint name), or skip
+3. Main model            → Present active sprint to user:
+                           Show sprint name, goal, and date range
+                           Ask: assign to this sprint, or leave unassigned?
 4. `explorer` agent      → Read git context + search codebase if needed for context
-6. Main model            → Draft title, description (plain text!), acceptance criteria
-7. Main model            → Preview FULL draft to user via AskUserQuestion (HARD-GATE below)
-8. Main model            → Create issue after user approves (createJiraIssue)
-9. Main model            → Offer to create a feature branch (git checkout -b feat/PROJ-123-slug)
+5. Main model            → Draft title, description (plain text!), acceptance criteria
+6. Main model            → Preview FULL draft to user via AskUserQuestion (HARD-GATE below)
+                           Include sprint assignment in preview if selected
+7. Main model            → Create issue after user approves (createJiraIssue)
+8. Main model            → Offer to create a feature branch (git checkout -b feat/PROJ-123-slug)
 ```
+
+Step 1c is critical — sprint context must ALWAYS be fetched before drafting. If the JQL returns no active sprint, inform the user that no sprint is active and proceed without sprint assignment.
 
 ### Required Fields & Custom Fields
 

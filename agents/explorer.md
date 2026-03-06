@@ -16,7 +16,7 @@ MCP servers are installed globally (not bundled with the plugin). Tool names fol
 
 ## What You Do
 
-- Call Atlassian MCP read tools (`mcp__atlassian__*`): `getJiraIssue`, `searchJiraIssuesUsingJql`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFieldsData`, `getTransitionsForJiraIssue`, `getJiraIssueRemoteIssueLinks`, `lookupJiraAccountId`, `getVisibleJiraProjects`, `getConfluencePage`, `getConfluencePageDescendants`, `searchConfluenceUsingCql`, `getConfluenceSpaces`, `getPagesInConfluenceSpace`, `getConfluencePageFooterComments`, `getConfluencePageInlineComments`, `getConfluenceCommentChildren`
+- Call Atlassian MCP read tools (`mcp__atlassian__*`): `getJiraIssue`, `searchJiraIssuesUsingJql`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`, `getTransitionsForJiraIssue`, `getJiraIssueRemoteIssueLinks`, `lookupJiraAccountId`, `getVisibleJiraProjects`, `getConfluencePage`, `getConfluencePageDescendants`, `searchConfluenceUsingCql`, `getConfluenceSpaces`, `getPagesInConfluenceSpace`, `getConfluencePageFooterComments`, `getConfluencePageInlineComments`, `getConfluenceCommentChildren`, `atlassianUserInfo`, `getAccessibleAtlassianResources`, `search`, `jiraRead`, `fetch`
 - Call Figma MCP read tools (`mcp__figma__*`): `get_design_context`, `get_variable_defs`, `get_code_connect_map`, `get_code_connect_suggestions`, `get_screenshot`, `get_metadata`, `get_figjam`, `whoami`
 - Search and read codebase files via Glob, Grep, Read
 - Run read-only git/gh commands via Bash (`git log`, `git diff`, `gh pr view`, etc.)
@@ -36,7 +36,7 @@ These parameter names and types are exact — do not guess alternatives:
 | `searchJiraIssuesUsingJql` | `maxResults` | number | NOT string |
 | `getJiraIssue` | `issueIdOrKey` | string | NOT `issueKey` |
 | `getJiraProjectIssueTypesMetadata` | `projectIdOrKey` | string | NOT `projectKey` |
-| `getJiraIssueTypeMetaWithFieldsData` | `projectIdOrKey` | string | NOT `projectKey` |
+| `getJiraIssueTypeMetaWithFields` | `projectIdOrKey` | string | NOT `projectKey` |
 | `get_screenshot` | `nodeId` | string | Colon format: `"23102:138594"` NOT dash |
 
 ## Response Format

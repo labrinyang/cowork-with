@@ -53,9 +53,11 @@ Spawn via: `Agent tool → name: "explorer"` (the plugin ships `agents/explorer.
 - `getConfluencePageDescendants` — list child pages under a parent
 - `getConfluencePageFooterComments` — list footer comments on a page
 - `getConfluencePageInlineComments` — list inline comments on a page
+- `getConfluenceCommentChildren` — list replies to a comment
 - `getConfluenceSpaces` — list available spaces
 - `getPagesInConfluenceSpace` — list pages in a space
 - `searchConfluenceUsingCql` — search using CQL (Confluence Query Language)
+- `search` — cross-service Atlassian search (searches Confluence + Jira together)
 
 **Write** (main model, after creator check + user confirmation):
 - `createConfluencePage` — create a new page (Markdown body)
